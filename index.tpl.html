@@ -152,6 +152,7 @@ tbody tr{transition:background var(--d-feedback) var(--e-out)}
       <option value="unserved_m">Colour: unserved people</option>
       <option value="losses">Colour: T&amp;D losses</option>
       <option value="km_per_1000km2">Colour: line density</option>
+      <option value="year_access">Colour: data recency</option>
     </select>
     <button class="btn" id="gridtoggle">Grid lines: on</button>
   </div>
@@ -204,6 +205,8 @@ let ROWS=[], BY_ISO={}, TAB="access", SORT={key:"unserved_m",dir:-1};
 let MAP=null, OVERLAY=null, MODE="2d", SHOW_GRID=true, GEO=null, GEOJSON=null;
 let GRIDCACHE=new Map(), GRIDTIMER=null, GRIDDATA={type:"FeatureCollection",features:[]};
 window.MAP=null;
+window.__grid=()=>GRIDDATA.features.length;
+window.__raster=()=>{try{return MAP.getLayoutProperty("gp","visibility")}catch(e){return "none"}};
 
 const COLS = {
   access: [
@@ -338,12 +341,15 @@ const RAMP={
   unserved_m:["#1d2a33","#28505c","#357f6e","#63b287","#f0a13a","#e05c5c"],
   losses:["#1d2a33","#28505c","#357f6e","#c99a3a","#e07b3a","#e05c5c"],
   km_per_1000km2:["#1d2a33","#28505c","#357f6e","#63b287","#c9c83a","#f0a13a"],
+  year_access:["#6b1f1f","#9c3a32","#c06a34","#c99a3a","#6fae7a","#2f8f6f"],
 };
-const RANGE={access:[0,100],unserved_m:[0,60],losses:[0,30],km_per_1000km2:[0,600]};
+const RANGE={access:[0,100],unserved_m:[0,60],losses:[0,30],km_per_1000km2:[0,600],year_access:[2010,2026]};
+const TABMETRIC={access:"access",perf:"losses",net:"km_per_1000km2",cover:"year_access"};
 
 function hex2rgb(h){return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16),210];}
 function rampColour(metric,v){
   const c=RAMP[metric], [lo,hi]=RANGE[metric];
+  if(v===null||v===undefined||isNaN(v)) return [60,70,84,140];
   const t=Math.max(0,Math.min(1,(v-lo)/(hi-lo)));
   const i=Math.min(c.length-2,Math.floor(t*(c.length-1)));
   const f=t*(c.length-1)-i;
@@ -357,7 +363,7 @@ function buildGeo(){
     const r=BY_ISO[f.properties.iso]; if(!r) return;
     feats.push({type:"Feature",geometry:f.geometry,
       properties:{iso:r.iso,access:r.access,unserved_m:r.unserved_m,losses:r.losses,
-        km_per_1000km2:r.km_per_1000km2}});
+        km_per_1000km2:Number(r.km_per_1000km2)||0,year_access:Number(r.year_access)||2010}});
   });
   return {type:"FeatureCollection",features:feats};
 }
@@ -454,31 +460,51 @@ function setMode(m){
 
 function updateNote(){
   const z=MAP.getZoom();
-  document.getElementById("mapnote").textContent = z<3
-    ? "World view: predicted grid presence as shading. Zoom past level 3 for line geometry."
-    : "Lines: gridfinder prediction, amber where OpenStreetMap has mapped them.";
+  const el=document.getElementById("mapnote");
+  if(!SHOW_GRID){
+    el.textContent="Grid lines hidden. Shading shows predicted presence.";
+  } else if(z<3){
+    el.textContent="World view: predicted grid presence as shading. Zoom past level 3 for line geometry.";
+  } else {
+    el.textContent="Line geometry from the published feature service. Teal predicted, amber already mapped in OpenStreetMap.";
+  }
+}
+
+function applyRasterVisibility(){
+  if(!MAP||!MAP.getLayer("gp")) return;
+  const show=SHOW_GRID && MAP.getZoom()<3;
+  MAP.setLayoutProperty("gp","visibility",show?"visible":"none");
+  MAP.setPaintProperty("gp","raster-opacity",show?0.5:0);
 }
 
 function refreshGrid(){
-  if(!MAP||!SHOW_GRID) return;
+  applyRasterVisibility();
+  if(!MAP||!SHOW_GRID){ GRIDDATA={type:"FeatureCollection",features:[]}; refreshDeck(); return; }
   const z=MAP.getZoom();
-  if(z<3) return;
+  if(z<3){
+    if(GRIDDATA.features.length){ GRIDDATA={type:"FeatureCollection",features:[]}; refreshDeck(); }
+    return;
+  }
   const b=MAP.getBounds();
   const key=[b.getWest(),b.getSouth(),b.getEast(),b.getNorth()].map(v=>v.toFixed(2)).join(",");
-  if(GRIDCACHE.has(key)){GRIDDATA=GRIDCACHE.get(key);refreshDeck();return;}
+  if(GRIDCACHE.has(key)){ GRIDDATA=GRIDCACHE.get(key); refreshDeck(); return; }
   clearTimeout(GRIDTIMER);
   GRIDTIMER=setTimeout(()=>{
+    const zz=MAP.getZoom();
+    if(zz<3) return;
+    const bb=MAP.getBounds();
     const params=new URLSearchParams({
       where:"1=1",outFields:"source",returnGeometry:"true",f:"geojson",
       geometryType:"esriGeometryEnvelope",inSR:"4326",outSR:"4326",
       spatialRel:"esriSpatialRelIntersects",resultRecordCount:"2000",
-      geometry:[b.getWest(),b.getSouth(),b.getEast(),b.getNorth()].join(",")
+      geometry:[bb.getWest(),bb.getSouth(),bb.getEast(),bb.getNorth()].join(",")
     });
     fetch(GRID_SVC+"?"+params).then(r=>r.json()).then(gj=>{
-      if(!gj.features) return;
-      GRIDCACHE.set(key,gj); GRIDDATA=gj; refreshDeck();
+      if(!gj||!gj.features) return;
+      const k=[bb.getWest(),bb.getSouth(),bb.getEast(),bb.getNorth()].map(v=>v.toFixed(2)).join(",");
+      GRIDCACHE.set(k,gj); GRIDDATA=gj; refreshDeck(); updateNote();
     }).catch(()=>{});
-  },450);
+  },400);
 }
 
 function focusCountry(iso,fly=true){
@@ -506,6 +532,8 @@ function focusCountry(iso,fly=true){
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
   document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
   t.classList.add("on"); TAB=t.dataset.t;
+  const m=TABMETRIC[TAB];
+  if(m){ METRIC=m; const sel=document.getElementById("metric"); if(sel) sel.value=m; refreshDeck(); }
   SORT={key:COLS[TAB][0].k,dir:1}; render();
 });
 document.getElementById("q").oninput=render;
