@@ -316,9 +316,13 @@ function filtered(){
 
 function render(){
   const isCharts = TAB==="charts", isGpu = TAB==="gpu";
+  const chartMode = isCharts || isGpu;
   document.getElementById("charts").hidden = !isCharts;
   document.getElementById("gpu").hidden = !isGpu;
-  document.getElementById("tblwrap").hidden = isCharts || isGpu;
+  document.getElementById("tblwrap").hidden = chartMode;
+  const mp=document.getElementById("map"), mb=document.querySelector(".mapbar");
+  if(mp) mp.hidden = chartMode;
+  if(mb) mb.hidden = chartMode;
   if(isCharts){ drawCharts(); document.getElementById("count").textContent=ROWS.length+" countries"; return; }
   if(isGpu){ drawChartsGPU(); document.getElementById("count").textContent=ROWS.length+" countries"; return; }
   const cols=COLS[TAB], th=document.getElementById("thead");
@@ -643,7 +647,7 @@ function initMap(){
         paint:{"raster-opacity":["interpolate",["linear"],["zoom"],2.4,0.95,3.6,0.55,4.4,0.0],
                "raster-fade-duration":0,"raster-resampling":"linear"}});
 
-      OVERLAY=new deck.MapboxOverlay({interleaved:true, layers:deckLayers()});
+      OVERLAY=new deck.MapboxOverlay({interleaved:false, layers:deckLayers()});
       window.OVERLAY=OVERLAY;
       MAP.addControl(OVERLAY);
 
