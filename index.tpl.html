@@ -99,6 +99,7 @@ th{min-height:36px}
 @keyframes cardIn{to{opacity:1;transform:none}}
 .card h3{margin:0;font-size:13px;font-weight:600;color:var(--ink);letter-spacing:.01em}
 .card p{margin:2px 0 12px;font-size:12px;color:var(--muted)}
+.card .plot{width:100%;height:258px}
 .card svg{display:block;width:100%;height:auto;overflow:visible}
 .card .bar{transform-origin:left center;animation:barIn .5s var(--e-out) both}
 @keyframes barIn{from{transform:scaleX(0)}to{transform:scaleX(1)}}
@@ -211,6 +212,7 @@ tbody tr{transition:background var(--d-feedback) var(--e-out)}
   <div class="foot" id="foot"></div>
 </div>
 
+<script src="vendor/echarts.min.js"></script>
 <script src="vendor/deck.gl.min.js"></script>
 <script src="data.js"></script>
 <script type="module">
@@ -363,89 +365,108 @@ function downloadCsv(){
 }
 
 
-/* ---------- charts ---------- */
+/* ---------- charts (Apache ECharts 6.1) ---------- */
+const ECH=[];
+function disposeCharts(){while(ECH.length){try{ECH.pop().dispose()}catch(e){}}}
+function ech(id,opt){
+  const el=document.getElementById(id); if(!el) return;
+  const c=echarts.init(el,null,{renderer:"canvas"});
+  c.setOption(opt); ECH.push(c);
+}
+const CFA={"fontFamily":"Inter,system-ui,-apple-system,Segoe UI,sans-serif","color":"#c9d6e2"};
+function axis(){return{
+  axisLine:{lineStyle:{color:"#22303d"}}, axisTick:{show:false},
+  axisLabel:{color:"#8fa3b5",fontSize:11}, splitLine:{lineStyle:{color:"#1b2530"}}
+};}
+function tip(extra){return Object.assign({backgroundColor:"rgba(11,14,19,.95)",borderColor:"#22303d",
+  borderWidth:1,textStyle:{color:"#e6edf3",fontSize:12},extraCssText:"border-radius:8px;"},extra||{});}
+
 function drawCharts(){
+  disposeCharts();
   const rows=filtered();
   const el=document.getElementById("charts");
   el.innerHTML=[
-    chartDensity(rows), chartLosses(rows), chartScatter(rows), chartRegions(rows)
-  ].join("");
-}
-
-function esc(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;");}
-
-function card(title,sub,body){
-  return `<div class="card"><h3>${title}</h3><p>${sub}</p>${body}</div>`;
-}
-
-function chartDensity(rows){
-  const top=rows.filter(r=>r.km_per_1000km2!=null).sort((a,b)=>b.km_per_1000km2-a.km_per_1000km2).slice(0,12);
-  const max=Math.max(...top.map(r=>r.km_per_1000km2),1);
-  const W=460,rowH=20,H=top.length*rowH+8,labelW=104,barMax=W-labelW-52;
-  const body=top.map((r,i)=>{
-    const w=Math.max(2,(r.km_per_1000km2/max)*barMax);
-    const y=i*rowH+6;
-    return `<g><text class="lbl" x="0" y="${y+11}">${esc(r.country.slice(0,17))}</text>`+
-      `<rect class="bar" x="${labelW}" y="${y}" width="${w.toFixed(1)}" height="13" rx="3" fill="url(#gcy)" style="animation-delay:${i*28}ms"/>`+
-      `<text class="val" x="${labelW+w+6}" y="${y+11}">${Math.round(r.km_per_1000km2)}</text></g>`;
-  }).join("");
-  const svg=`<svg viewBox="0 0 ${W} ${H}" role="img"><defs>`+
-    `<linearGradient id="gcy" x1="0" x2="1"><stop offset="0" stop-color="#0891b2"/><stop offset="1" stop-color="#22d3ee"/></linearGradient>`+
-    `</defs>${body}</svg>`;
-  return card("Line density, top 12","Predicted network km per 1,000 km2 of land",svg);
-}
-
-function chartLosses(rows){
-  const bins=[[0,5],[5,10],[10,15],[15,20],[20,100]];
-  const counts=bins.map(([a,b])=>rows.filter(r=>r.losses>=a&&r.losses<b).length);
-  const max=Math.max(...counts,1), W=460,H=170, base=H-26, gap=14;
-  const bw=(W-gap*(counts.length-1))/counts.length;
-  const body=counts.map((c,i)=>{
-    const h=Math.max(3,(c/max)*(base-24));
-    const x=i*(bw+gap);
-    return `<g><rect class="bar" x="${x}" y="${base-h}" width="${bw}" height="${h}" rx="4" fill="${i>=3?'#f59e0b':'#22d3ee'}" style="animation-delay:${i*60}ms;transform-origin:center bottom"/>`+
-      `<text class="val" x="${x+bw/2}" y="${base-h-6}" text-anchor="middle">${c}</text>`+
-      `<text class="lbl" x="${x+bw/2}" y="${base+15}" text-anchor="middle">${bins[i][0]}-${bins[i][1]===100?'+':bins[i][1]}%</text></g>`;
-  }).join("");
-  return card("Losses spread","Countries by transmission and distribution loss band",
-    `<svg viewBox="0 0 ${W} ${H}" role="img">${body}<line x1="0" y1="${base}" x2="${W}" y2="${base}" stroke="#2a3644"/></svg>`);
-}
-
-function chartScatter(rows){
-  const pts=rows.filter(r=>r.access!=null&&r.km_per_1000km2!=null);
-  const W=460,H=220,pad=34;
-  const maxD=Math.max(...pts.map(r=>r.km_per_1000km2),1);
-  const body=pts.map((r,i)=>{
-    const x=pad+(r.access/100)*(W-pad-12);
-    const y=(H-pad)-Math.min(1,r.km_per_1000km2/maxD)*(H-pad-18);
-    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.2" fill="#22d3ee" fill-opacity=".62" stroke="#0b0e13"/>`;
-  }).join("");
-  const grid=[0,25,50,75,100].map(v=>{
-    const x=pad+(v/100)*(W-pad-12);
-    return `<line x1="${x}" y1="4" x2="${x}" y2="${H-pad}" stroke="#202b38"/>`+
-      `<text class="lbl" x="${x}" y="${H-pad+15}" text-anchor="middle">${v}%</text>`;
-  }).join("");
-  return card("Access against density","Each dot is a country: national access rate on the horizontal axis, line density on the vertical",
-    `<svg viewBox="0 0 ${W} ${H}" role="img">${grid}${body}</svg>`);
+    ["c1","Unserved people by region","Millions without electricity access"],
+    ["c2","Line density leaders","Predicted network km per 1,000 km2"],
+    ["c3","Access against density","Bubble size is population, colour is losses"],
+    ["c4","Unserved by country","Top 24 countries, area scaled to people"],
+  ].map(([id,t,sub])=>`<div class="card"><h3>${t}</h3><p>${sub}</p><div class="plot" id="${id}"></div></div>`).join("");
+  requestAnimationFrame(()=>{ chartRegions(rows); chartDensity(rows); chartScatter(rows); chartTreemap(rows); });
 }
 
 function chartRegions(rows){
   const agg={};
-  rows.forEach(r=>{const k=r.region||"Other";agg[k]=(agg[k]||0)+r.unserved_m;});
-  const top=Object.entries(agg).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  const max=Math.max(...top.map(t=>t[1]),1), W=460,rowH=22,H=top.length*rowH+8;
-  const labelW=132, barMax=W-labelW-58;
-  const body=top.map(([k,v],i)=>{
-    const w=Math.max(2,(v/max)*barMax), y=i*rowH+5;
-    return `<g><text class="lbl" x="0" y="${y+12}">${esc(k.slice(0,22))}</text>`+
-      `<rect class="bar" x="${labelW}" y="${y}" width="${w.toFixed(1)}" height="14" rx="3" fill="url(#gor)" style="animation-delay:${i*40}ms"/>`+
-      `<text class="val" x="${labelW+w+6}" y="${y+12}">${Math.round(v)}m</text></g>`;
-  }).join("");
-  return card("Unserved people by region","Millions without electricity access",
-    `<svg viewBox="0 0 ${W} ${H}" role="img"><defs><linearGradient id="gor" x1="0" x2="1">`+
-    `<stop offset="0" stop-color="#b45309"/><stop offset="1" stop-color="#fbbf24"/></linearGradient></defs>${body}</svg>`);
+  rows.forEach(r=>{const k=(r.region||"Other").trim();agg[k]=(agg[k]||0)+r.unserved_m;});
+  const top=Object.entries(agg).sort((a,b)=>b[1]-a[1]).slice(0,9);
+  ech("c1",{
+    textStyle:CFA, tooltip:tip({trigger:"item",formatter:p=>`<b>${p.name}</b><br>${Math.round(p.value)} million`}),
+    series:[{
+      type:"pie", roseType:"area", radius:["28%","78%"], center:["50%","54%"],
+      itemStyle:{borderRadius:6,borderColor:"#121820",borderWidth:2,
+        color:params=>["#0e7490","#0891b2","#22d3ee","#67e8f9","#fbbf24","#f59e0b","#d97706","#b45309","#7c2d12"][params.dataIndex%9]},
+      label:{color:"#b9c8d6",fontSize:11,formatter:"{b}"},
+      labelLine:{lineStyle:{color:"#3a4a5a"}},
+      data:top.map(([k,v])=>({name:k,value:v})),
+      animationDuration:900, animationEasing:"cubicOut"
+    }]
+  });
 }
 
+function chartDensity(rows){
+  const top=rows.filter(r=>r.km_per_1000km2!=null).sort((a,b)=>b.km_per_1000km2-a.km_per_1000km2).slice(0,12).reverse();
+  ech("c2",{
+    textStyle:CFA, grid:{left:8,right:52,top:8,bottom:8,containLabel:true},
+    tooltip:tip({trigger:"axis",axisPointer:{type:"shadow"},formatter:p=>{const d=p[0];return `<b>${d.name}</b><br>${Math.round(d.value)} km per 1,000 km2`;}}),
+    xAxis:Object.assign({type:"value"},axis(),{splitLine:{show:false}}),
+    yAxis:Object.assign({type:"category",data:top.map(r=>r.country)},axis(),{splitLine:{show:false}}),
+    series:[{
+      type:"bar", data:top.map(r=>r.km_per_1000km2), barWidth:"62%",
+      itemStyle:{borderRadius:[0,4,4,0], color:{type:"linear",x:0,y:0,x2:1,y2:0,
+        colorStops:[{offset:0,color:"#0e7490"},{offset:1,color:"#22d3ee"}]}},
+      label:{show:true,position:"right",color:"#c9d6e2",fontSize:11,formatter:p=>Math.round(p.value)},
+      animationDelay:i=>i*40, animationDuration:700
+    }]
+  });
+}
+
+function chartScatter(rows){
+  const pts=rows.filter(r=>r.access!=null&&r.km_per_1000km2!=null);
+  ech("c3",{
+    textStyle:CFA, grid:{left:10,right:16,top:16,bottom:34,containLabel:true},
+    tooltip:tip({formatter:p=>`<b>${p.data[2]}</b><br>Access ${p.data[0]}%<br>Density ${Math.round(p.data[1])}<br>Losses ${p.data[3]||"n/a"}%`}),
+    xAxis:Object.assign({type:"value",min:0,max:100,name:"access %",nameTextStyle:{color:"#6b7c8d",fontSize:10}},axis()),
+    yAxis:Object.assign({type:"value",name:"km per 1,000 km2",nameTextStyle:{color:"#6b7c8d",fontSize:10}},axis()),
+    visualMap:{show:false,min:0,max:30,dimension:3,
+      inRange:{color:["#22d3ee","#a3e635","#fbbf24","#ef4444"]}},
+    series:[{
+      type:"scatter",
+      data:pts.map(r=>[r.access,r.km_per_1000km2,r.country,r.losses,r.pop_m]),
+      symbolSize:d=>Math.max(5,Math.min(26,Math.sqrt(d[4]||1)*1.7)),
+      itemStyle:{opacity:.78,borderColor:"#0b0e13",borderWidth:.6},
+      emphasis:{itemStyle:{opacity:1,borderColor:"#fff",borderWidth:1}},
+      animationDuration:800
+    }]
+  });
+}
+
+function chartTreemap(rows){
+  const top=rows.filter(r=>r.unserved_m>0).sort((a,b)=>b.unserved_m-a.unserved_m).slice(0,24);
+  ech("c4",{
+    textStyle:CFA, tooltip:tip({formatter:p=>`<b>${p.name}</b><br>${p.value.toFixed(1)} million unserved`}),
+    series:[{
+      type:"treemap", roam:false, nodeClick:false, breadcrumb:{show:false},
+      width:"100%",height:"100%", top:0,left:0,right:0,bottom:0,
+      itemStyle:{borderColor:"#0b0e13",borderWidth:2,gapWidth:2,borderRadius:4},
+      label:{show:true,color:"#06121a",fontSize:11,fontWeight:600,formatter:p=>p.name},
+      levels:[{itemStyle:{borderColor:"#0b0e13",borderWidth:3,gapWidth:3}}],
+      color:["#22d3ee","#0891b2","#0e7490","#67e8f9","#fbbf24","#f59e0b","#d97706"],
+      data:top.map(r=>({name:r.country,value:Math.max(0.4,r.unserved_m)})),
+      animationDuration:800
+    }]
+  });
+}
+
+window.addEventListener("resize",()=>{ECH.forEach(c=>{try{c.resize()}catch(e){}})});
 /* ---------- map ---------- */
 const RAMP={
   access:["#6b1f1f","#9c3a32","#c06a34","#c99a3a","#6fae7a","#2f8f6f"],

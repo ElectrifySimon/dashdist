@@ -66,3 +66,13 @@ bash publish.sh                                      # encrypt and stage gated/
 
 Below zoom 3 the page shows the presence raster only. Zoom 3 to 4.5 loads level 4
 tiles, above that level 5. Tiles are cached in the browser per session.
+
+## Vendored libraries
+
+| File | Version | Licence |
+|---|---|---|
+| `vendor/maplibre-gl.mjs` + worker + css | 6.19.0 | BSD-3-Clause |
+| `vendor/deck.gl.min.js` | 9.4.1 | MIT |
+| `vendor/echarts.min.js` | 6.1.0 | Apache-2.0 (1,121,883 bytes) |
+
+All three are served from the site. No CDN and no API key at runtime.
