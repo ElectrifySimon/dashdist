@@ -7,7 +7,7 @@ python3 build.py
 
 rm -rf build gated
 mkdir -p build
-cp index.html build/index.html
+cp index.tpl.html build/index.html
 # inline data.js so the table data sits inside the encrypted payload
 python3 - <<'PY'
 import pathlib, re
