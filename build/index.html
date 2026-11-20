@@ -2776,7 +2776,7 @@ async function drawChartsGPU(){
   };
   const fmtIdx=labels=>v=>labels[Math.round(v)]||"";
 
-  // 1 region totals
+  // 1 unserved by region, bars
   const agg={};
   rows.forEach(r=>{const k=(r.region||"Other").trim();agg[k]=(agg[k]||0)+r.unserved_m;});
   const reg=Object.entries(agg).sort((a,b)=>b[1]-a[1]).slice(0,8);
@@ -2784,34 +2784,34 @@ async function drawChartsGPU(){
     xAxis:{type:"value",tickFormatter:fmtIdx(reg.map(d=>d[0]))},
     yAxis:{},
     series:[{type:"bar",name:"Unserved",data:{x:reg.map((d,i)=>i),y:reg.map(d=>Math.round(d[1]))},
-             color:"#22d3ee",barWidth:0.6}]
+             color:"#22d3ee",barWidth:0.62}]
   });
 
-  // 2 density
-  const dens=rows.filter(r=>r.km_per_1000km2!=null).sort((a,b)=>b.km_per_1000km2-a.km_per_1000km2).slice(0,10);
+  // 2 density as a filled mountain over ranked countries
+  const dens=rows.filter(r=>r.km_per_1000km2!=null).sort((a,b)=>b.km_per_1000km2-a.km_per_1000km2).slice(0,14);
   await mk("g2",{
     xAxis:{type:"value",tickFormatter:fmtIdx(dens.map(r=>r.country))},
     yAxis:{},
-    series:[{type:"bar",name:"Density",data:{x:dens.map((d,i)=>i),y:dens.map(r=>Math.round(r.km_per_1000km2))},
-             color:"#a3e635",barWidth:0.6}]
+    series:[{type:"area",name:"Density",data:{x:dens.map((d,i)=>i),y:dens.map(r=>Math.round(r.km_per_1000km2))},
+             color:"#a3e635",areaStyle:{opacity:0.35},lineStyle:{width:2}}]
   });
 
-  // 3 scatter
+  // 3 scatter, size by population
   const sc=rows.filter(r=>r.access!=null&&r.km_per_1000km2!=null);
   await mk("g3",{
     xAxis:{type:"value"}, yAxis:{},
-    series:[{type:"scatter",name:"Countries",data:{x:sc.map(r=>r.access),y:sc.map(r=>r.km_per_1000km2)},
-             color:"#fbbf24",symbolSize:4}]
+    series:[{type:"scatter",name:"Countries",
+             data:{x:sc.map(r=>r.access),y:sc.map(r=>r.km_per_1000km2)},
+             color:"#fbbf24",symbolSize:d=>Math.max(3,Math.min(14,Math.sqrt((d&&d.size)||1))) }]
   });
 
-  // 4 losses
-  const los=rows.filter(r=>r.losses!=null).sort((a,b)=>b.losses-a.losses).slice(0,10);
+  // 4 regional share, donut
+  const share=reg.map(d=>({name:d[0],value:Math.round(d[1])}));
   await mk("g4",{
-    xAxis:{type:"value",tickFormatter:fmtIdx(los.map(r=>r.country))},
-    yAxis:{},
-    series:[{type:"bar",name:"Losses",data:{x:los.map((d,i)=>i),y:los.map(r=>r.losses)},
-             color:"#f97316",barWidth:0.6}]
+    series:[{type:"pie",name:"Share",data:share,radius:{inner:0.55,outer:0.85},
+             label:{show:true}}]
   });
+
 }
 
 /* ---------- map ---------- */
