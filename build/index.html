@@ -3206,7 +3206,13 @@ document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
   if(m){ METRIC=m; const sel=document.getElementById("metric"); if(sel) sel.value=m; refreshDeck(); updateLegend(); }
   if(COLS[TAB]) SORT={key:COLS[TAB][0].k,dir:1};
   render();
-  requestAnimationFrame(()=>{ try{MAP&&MAP.resize()}catch(e){} });
+  requestAnimationFrame(()=>{
+    try{MAP&&MAP.resize()}catch(e){}
+    if(TAB==="charts"||TAB==="gpu"){
+      const sec=document.getElementById(TAB==="charts"?"charts":"gpu");
+      if(sec) sec.scrollIntoView({behavior:"smooth",block:"start"});
+    }
+  });
 });
 document.getElementById("q").oninput=render;
 document.getElementById("region").onchange=render;
