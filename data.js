@@ -3,7 +3,8 @@ window.TRACKER_DATA = {
   "title": "Distribution Grid Dashboard",
   "subtitle": "Country panel: access, consumption and network losses",
   "as_of": "2026-11-20",
-  "note": "All figures from World Bank World Development Indicators, latest available year 2010-2025. Unserved population is derived (population x (1 - access rate)). Year columns show the observation year for each series."
+  "note": "All figures from World Bank World Development Indicators, latest available year 2010-2025. Unserved population is derived (population x (1 - access rate)). Year columns show the observation year for each series.",
+  "network_source": "ESMAP gridfinder predicted network, CC BY 4.0"
  },
  "rows": [
   {
@@ -21,7 +22,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 1224.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 62038.4,
+   "km_per_1000km2": 68.52,
+   "km_per_1000_people": 261.21
   },
   {
    "iso": "COD",
@@ -38,7 +42,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 807.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 47640.7,
+   "km_per_1000km2": 20.5,
+   "km_per_1000_people": 422.35
   },
   {
    "iso": "ETH",
@@ -55,7 +62,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 933.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 39274.7,
+   "km_per_1000km2": 34.68,
+   "km_per_1000_people": 289.85
   },
   {
    "iso": "TZA",
@@ -72,7 +82,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 1319.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 29617.4,
+   "km_per_1000km2": 31.76,
+   "km_per_1000_people": 420.11
   },
   {
    "iso": "UGA",
@@ -89,7 +102,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 1206.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 14941.0,
+   "km_per_1000km2": 60.82,
+   "km_per_1000_people": 290.68
   },
   {
    "iso": "MOZ",
@@ -106,7 +122,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 627.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 22719.6,
+   "km_per_1000km2": 28.01,
+   "km_per_1000_people": 638.19
   },
   {
    "iso": "NER",
@@ -123,7 +142,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 775.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 5887.4,
+   "km_per_1000km2": 4.98,
+   "km_per_1000_people": 211.02
   },
   {
    "iso": "MDG",
@@ -140,7 +162,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 599.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 3024.8,
+   "km_per_1000km2": 5.13,
+   "km_per_1000_people": 92.5
   },
   {
    "iso": "TCD",
@@ -157,7 +182,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 1022.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 5669.3,
+   "km_per_1000km2": 4.46,
+   "km_per_1000_people": 269.96
   },
   {
    "iso": "SDN",
@@ -174,7 +202,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 1165.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 19688.1,
+   "km_per_1000km2": 10.65,
+   "km_per_1000_people": 380.81
   },
   {
    "iso": "AGO",
@@ -191,7 +222,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 3129.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 30490.8,
+   "km_per_1000km2": 24.49,
+   "km_per_1000_people": 781.82
   },
   {
    "iso": "BFA",
@@ -208,7 +242,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 1148.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 11182.9,
+   "km_per_1000km2": 41.17,
+   "km_per_1000_people": 464.02
   },
   {
    "iso": "KEN",
@@ -225,7 +262,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 2363.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 22657.9,
+   "km_per_1000km2": 38.34,
+   "km_per_1000_people": 394.05
   },
   {
    "iso": "SSD",
@@ -242,7 +282,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 1080.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 3190.6,
+   "km_per_1000km2": 5.1,
+   "km_per_1000_people": 261.52
   },
   {
    "iso": "PAK",
@@ -259,7 +302,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 1596.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 98176.1,
+   "km_per_1000km2": 112.33,
+   "km_per_1000_people": 384.7
   },
   {
    "iso": "MMR",
@@ -276,7 +322,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 1489.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 34606.7,
+   "km_per_1000km2": 50.93,
+   "km_per_1000_people": 630.36
   },
   {
    "iso": "ZMB",
@@ -293,7 +342,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 1318.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 24839.2,
+   "km_per_1000km2": 33.03,
+   "km_per_1000_people": 1134.21
   },
   {
    "iso": "CIV",
@@ -310,7 +362,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 3050.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 23802.6,
+   "km_per_1000km2": 72.14,
+   "km_per_1000_people": 727.91
   },
   {
    "iso": "CMR",
@@ -327,7 +382,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 1972.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 16572.4,
+   "km_per_1000km2": 36.0,
+   "km_per_1000_people": 554.26
   },
   {
    "iso": "ZWE",
@@ -344,7 +402,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 3021.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 19467.1,
+   "km_per_1000km2": 51.75,
+   "km_per_1000_people": 1145.13
   },
   {
    "iso": "ZAF",
@@ -361,7 +422,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 6598.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 118938.4,
+   "km_per_1000km2": 97.79,
+   "km_per_1000_people": 1838.31
   },
   {
    "iso": "BEN",
@@ -378,7 +442,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 1658.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 7296.9,
+   "km_per_1000km2": 62.35,
+   "km_per_1000_people": 493.03
   },
   {
    "iso": "PHL",
@@ -395,7 +462,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 4171.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 34470.5,
+   "km_per_1000km2": 117.93,
+   "km_per_1000_people": 295.12
   },
   {
    "iso": "YEM",
@@ -412,7 +482,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 634.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 8920.5,
+   "km_per_1000km2": 19.58,
+   "km_per_1000_people": 213.41
   },
   {
    "iso": "HTI",
@@ -429,7 +502,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 2694.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 2042.3,
+   "km_per_1000km2": 71.44,
+   "km_per_1000_people": 171.62
   },
   {
    "iso": "RWA",
@@ -446,7 +522,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 1124.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 2727.0,
+   "km_per_1000km2": 116.07,
+   "km_per_1000_people": 186.78
   },
   {
    "iso": "TGO",
@@ -463,7 +542,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 1384.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 6724.7,
+   "km_per_1000km2": 110.31,
+   "km_per_1000_people": 781.94
   },
   {
    "iso": "SEN",
@@ -480,7 +562,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 1955.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 7617.9,
+   "km_per_1000km2": 39.18,
+   "km_per_1000_people": 403.06
   },
   {
    "iso": "COG",
@@ -497,7 +582,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 2515.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 9953.0,
+   "km_per_1000km2": 29.31,
+   "km_per_1000_people": 1531.23
   },
   {
    "iso": "GHA",
@@ -514,7 +602,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 3257.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 25876.2,
+   "km_per_1000km2": 106.29,
+   "km_per_1000_people": 737.21
   },
   {
    "iso": "SYR",
@@ -531,7 +622,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 1057.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 19691.5,
+   "km_per_1000km2": 106.39,
+   "km_per_1000_people": 769.2
   },
   {
    "iso": "GTM",
@@ -548,7 +642,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 6598.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 14148.9,
+   "km_per_1000km2": 129.26,
+   "km_per_1000_people": 756.63
   },
   {
    "iso": "LBY",
@@ -565,7 +662,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 6449.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 30222.1,
+   "km_per_1000km2": 18.49,
+   "km_per_1000_people": 4029.61
   },
   {
    "iso": "IND",
@@ -582,7 +682,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 2702.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 925775.8,
+   "km_per_1000km2": 294.53,
+   "km_per_1000_people": 632.4
   },
   {
    "iso": "PER",
@@ -599,7 +702,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 9684.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 56906.7,
+   "km_per_1000km2": 43.45,
+   "km_per_1000_people": 1644.7
   },
   {
    "iso": "BGD",
@@ -616,7 +722,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 2597.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 27668.0,
+   "km_per_1000km2": 206.83,
+   "km_per_1000_people": 157.47
   },
   {
    "iso": "NIC",
@@ -633,7 +742,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 3173.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 7532.8,
+   "km_per_1000km2": 58.11,
+   "km_per_1000_people": 1076.12
   },
   {
    "iso": "ARG",
@@ -650,7 +762,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 14898.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 111545.5,
+   "km_per_1000km2": 40.06,
+   "km_per_1000_people": 2430.18
   },
   {
    "iso": "NPL",
@@ -667,7 +782,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 1536.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 12197.8,
+   "km_per_1000km2": 81.03,
+   "km_per_1000_people": 412.09
   },
   {
    "iso": "COL",
@@ -684,7 +802,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 8562.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 61336.2,
+   "km_per_1000km2": 53.23,
+   "km_per_1000_people": 1148.62
   },
   {
    "iso": "HND",
@@ -701,7 +822,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 3598.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 13444.8,
+   "km_per_1000km2": 118.08,
+   "km_per_1000_people": 1222.26
   },
   {
    "iso": "BOL",
@@ -718,7 +842,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 5148.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 31827.8,
+   "km_per_1000km2": 29.33,
+   "km_per_1000_people": 2526.02
   },
   {
    "iso": "BRA",
@@ -735,7 +862,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 10713.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 512171.7,
+   "km_per_1000km2": 60.2,
+   "km_per_1000_people": 2406.82
   },
   {
    "iso": "IDN",
@@ -752,7 +882,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 5060.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 145302.8,
+   "km_per_1000km2": 79.88,
+   "km_per_1000_people": 508.59
   },
   {
    "iso": "LAO",
@@ -769,7 +902,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 2325.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 14085.5,
+   "km_per_1000km2": 61.48,
+   "km_per_1000_people": 1782.97
   },
   {
    "iso": "ECU",
@@ -786,7 +922,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 7125.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 28043.6,
+   "km_per_1000km2": 111.86,
+   "km_per_1000_people": 1532.44
   },
   {
    "iso": "MEX",
@@ -803,7 +942,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 13889.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 200963.7,
+   "km_per_1000km2": 102.08,
+   "km_per_1000_people": 1523.61
   },
   {
    "iso": "CHL",
@@ -820,7 +962,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 17995.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 31483.4,
+   "km_per_1000km2": 38.63,
+   "km_per_1000_people": 1582.08
   },
   {
    "iso": "KHM",
@@ -837,7 +982,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 2872.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 14836.6,
+   "km_per_1000km2": 81.45,
+   "km_per_1000_people": 833.52
   },
   {
    "iso": "SLV",
@@ -854,7 +1002,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 5767.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 4662.4,
+   "km_per_1000km2": 223.35,
+   "km_per_1000_people": 728.49
   },
   {
    "iso": "DOM",
@@ -871,7 +1022,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 11059.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 6791.6,
+   "km_per_1000km2": 141.19,
+   "km_per_1000_people": 590.58
   },
   {
    "iso": "PRY",
@@ -888,7 +1042,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 7027.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 24826.3,
+   "km_per_1000km2": 61.85,
+   "km_per_1000_people": 3546.62
   },
   {
    "iso": "TJK",
@@ -905,7 +1062,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 1637.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 10606.9,
+   "km_per_1000km2": 76.86,
+   "km_per_1000_people": 982.12
   },
   {
    "iso": "CRI",
@@ -922,7 +1082,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 19970.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 9718.7,
+   "km_per_1000km2": 180.81,
+   "km_per_1000_people": 1868.98
   },
   {
    "iso": "THA",
@@ -939,7 +1102,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 8057.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 92213.8,
+   "km_per_1000km2": 180.78,
+   "km_per_1000_people": 1287.9
   },
   {
    "iso": "HKG",
@@ -956,7 +1122,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 56983.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": null,
+   "km_per_1000km2": null,
+   "km_per_1000_people": null
   },
   {
    "iso": "HUN",
@@ -973,7 +1142,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 25907.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 25406.8,
+   "km_per_1000km2": 274.58,
+   "km_per_1000_people": 2674.4
   },
   {
    "iso": "ARE",
@@ -990,7 +1162,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 50274.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 10097.0,
+   "km_per_1000km2": 126.09,
+   "km_per_1000_people": 878.0
   },
   {
    "iso": "PRT",
@@ -1007,7 +1182,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 32082.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 27919.7,
+   "km_per_1000km2": 298.82,
+   "km_per_1000_people": 2585.16
   },
   {
    "iso": "DEU",
@@ -1024,7 +1202,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 60496.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 120700.5,
+   "km_per_1000km2": 337.59,
+   "km_per_1000_people": 1445.51
   },
   {
    "iso": "JOR",
@@ -1041,7 +1222,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 5348.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 6892.8,
+   "km_per_1000km2": 77.49,
+   "km_per_1000_people": 599.37
   },
   {
    "iso": "IRL",
@@ -1058,7 +1242,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 131592.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 15423.8,
+   "km_per_1000km2": 263.76,
+   "km_per_1000_people": 2804.33
   },
   {
    "iso": "AZE",
@@ -1075,7 +1262,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 7411.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 16016.6,
+   "km_per_1000km2": 175.77,
+   "km_per_1000_people": 1570.25
   },
   {
    "iso": "CHE",
@@ -1092,7 +1282,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 114769.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 13174.4,
+   "km_per_1000km2": 285.22,
+   "km_per_1000_people": 1447.74
   },
   {
    "iso": "UZB",
@@ -1109,7 +1302,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 3968.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 34046.1,
+   "km_per_1000km2": 73.79,
+   "km_per_1000_people": 917.68
   },
   {
    "iso": "SGP",
@@ -1126,7 +1322,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 98814.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": null,
+   "km_per_1000km2": null,
+   "km_per_1000_people": null
   },
   {
    "iso": "GBR",
@@ -1143,7 +1342,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 57602.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 62284.0,
+   "km_per_1000km2": 249.31,
+   "km_per_1000_people": 896.17
   },
   {
    "iso": "ESP",
@@ -1160,7 +1362,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 38627.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 106964.0,
+   "km_per_1000km2": 212.98,
+   "km_per_1000_people": 2165.26
   },
   {
    "iso": "NOR",
@@ -1177,7 +1382,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 94594.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 51576.7,
+   "km_per_1000km2": 129.83,
+   "km_per_1000_people": 9210.13
   },
   {
    "iso": "SAU",
@@ -1194,7 +1402,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 34537.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 91383.9,
+   "km_per_1000km2": 47.59,
+   "km_per_1000_people": 2469.84
   },
   {
    "iso": "AUS",
@@ -1211,7 +1422,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 65130.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 95394.9,
+   "km_per_1000km2": 12.41,
+   "km_per_1000_people": 3456.34
   },
   {
    "iso": "ITA",
@@ -1228,7 +1442,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 43309.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 100973.8,
+   "km_per_1000km2": 320.39,
+   "km_per_1000_people": 1714.33
   },
   {
    "iso": "MAR",
@@ -1245,7 +1462,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 4672.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 48526.2,
+   "km_per_1000km2": 81.99,
+   "km_per_1000_people": 1263.7
   },
   {
    "iso": "IRN",
@@ -1262,7 +1482,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 3924.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 195416.0,
+   "km_per_1000km2": 120.82,
+   "km_per_1000_people": 2114.89
   },
   {
    "iso": "CAN",
@@ -1279,7 +1502,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 55698.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 215015.6,
+   "km_per_1000km2": 21.42,
+   "km_per_1000_people": 5156.25
   },
   {
    "iso": "NLD",
@@ -1296,7 +1522,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 73684.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 12012.9,
+   "km_per_1000km2": 301.66,
+   "km_per_1000_people": 663.7
   },
   {
    "iso": "LKA",
@@ -1313,7 +1542,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 5002.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 11944.3,
+   "km_per_1000km2": 183.1,
+   "km_per_1000_people": 547.9
   },
   {
    "iso": "DNK",
@@ -1330,7 +1562,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 76970.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 12517.5,
+   "km_per_1000km2": 292.24,
+   "km_per_1000_people": 2086.25
   },
   {
    "iso": "FIN",
@@ -1347,7 +1582,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 56149.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 41498.9,
+   "km_per_1000km2": 121.61,
+   "km_per_1000_people": 7410.52
   },
   {
    "iso": "CZE",
@@ -1364,7 +1602,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 35917.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 30364.3,
+   "km_per_1000km2": 374.55,
+   "km_per_1000_people": 2785.72
   },
   {
    "iso": "IRQ",
@@ -1381,7 +1622,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 5410.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 40821.3,
+   "km_per_1000km2": 93.34,
+   "km_per_1000_people": 868.54
   },
   {
    "iso": "SRB",
@@ -1398,7 +1642,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 15262.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 19033.0,
+   "km_per_1000km2": 249.16,
+   "km_per_1000_people": 2928.15
   },
   {
    "iso": "ROU",
@@ -1415,7 +1662,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 22538.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 53669.2,
+   "km_per_1000km2": 225.13,
+   "km_per_1000_people": 2824.7
   },
   {
    "iso": "SWE",
@@ -1432,7 +1682,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 63133.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 63594.0,
+   "km_per_1000km2": 141.06,
+   "km_per_1000_people": 5999.44
   },
   {
    "iso": "EGY",
@@ -1449,7 +1702,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 3086.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 35676.0,
+   "km_per_1000km2": 35.78,
+   "km_per_1000_people": 301.32
   },
   {
    "iso": "VEN",
@@ -1466,7 +1722,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 3495.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 44988.2,
+   "km_per_1000km2": 49.52,
+   "km_per_1000_people": 1578.53
   },
   {
    "iso": "TKM",
@@ -1483,7 +1742,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 6540.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 19800.2,
+   "km_per_1000km2": 41.19,
+   "km_per_1000_people": 2605.29
   },
   {
    "iso": "OMN",
@@ -1500,7 +1762,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 19947.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 16364.1,
+   "km_per_1000km2": 52.92,
+   "km_per_1000_people": 2975.29
   },
   {
    "iso": "KAZ",
@@ -1517,7 +1782,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 14692.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 100462.7,
+   "km_per_1000km2": 36.82,
+   "km_per_1000_people": 4829.94
   },
   {
    "iso": "NZL",
@@ -1534,7 +1802,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 49591.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 17797.7,
+   "km_per_1000km2": 64.09,
+   "km_per_1000_people": 3358.06
   },
   {
    "iso": "BEL",
@@ -1551,7 +1822,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 60750.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 13914.6,
+   "km_per_1000km2": 461.33,
+   "km_per_1000_people": 1169.3
   },
   {
    "iso": "CUB",
@@ -1568,7 +1842,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 9605.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 17132.0,
+   "km_per_1000km2": 148.89,
+   "km_per_1000_people": 1571.74
   },
   {
    "iso": "LBN",
@@ -1585,7 +1862,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 4473.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 3228.6,
+   "km_per_1000km2": 319.26,
+   "km_per_1000_people": 556.65
   },
   {
    "iso": "POL",
@@ -1602,7 +1882,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 28420.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 99472.8,
+   "km_per_1000km2": 320.55,
+   "km_per_1000_people": 2732.77
   },
   {
    "iso": "ISR",
@@ -1619,7 +1902,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 60337.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 4912.1,
+   "km_per_1000km2": 213.59,
+   "km_per_1000_people": 486.35
   },
   {
    "iso": "RUS",
@@ -1636,7 +1922,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 17547.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 724577.7,
+   "km_per_1000km2": 42.57,
+   "km_per_1000_people": 5049.32
   },
   {
    "iso": "BLR",
@@ -1653,7 +1942,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 10279.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 40584.6,
+   "km_per_1000km2": 194.19,
+   "km_per_1000_people": 4459.85
   },
   {
    "iso": "CHN",
@@ -1670,7 +1962,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 13862.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 896497.3,
+   "km_per_1000km2": 95.28,
+   "km_per_1000_people": 637.35
   },
   {
    "iso": "TUR",
@@ -1687,7 +1982,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 18599.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 183266.3,
+   "km_per_1000km2": 229.41,
+   "km_per_1000_people": 2133.48
   },
   {
    "iso": "FRA",
@@ -1704,7 +2002,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 48986.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 150006.3,
+   "km_per_1000km2": 232.55,
+   "km_per_1000_people": 2183.5
   },
   {
    "iso": "KGZ",
@@ -1721,7 +2022,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 3081.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 12913.6,
+   "km_per_1000km2": 65.87,
+   "km_per_1000_people": 1768.98
   },
   {
    "iso": "USA",
@@ -1738,7 +2042,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 90027.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 1222035.6,
+   "km_per_1000km2": 128.5,
+   "km_per_1000_people": 3575.29
   },
   {
    "iso": "GRC",
@@ -1755,7 +2062,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 26948.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 27905.0,
+   "km_per_1000km2": 211.5,
+   "km_per_1000_people": 2683.17
   },
   {
    "iso": "UKR",
@@ -1772,7 +2082,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 5866.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 137824.2,
+   "km_per_1000km2": 240.73,
+   "km_per_1000_people": 3533.95
   },
   {
    "iso": "TUN",
@@ -1789,7 +2102,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 4657.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 17976.1,
+   "km_per_1000km2": 114.98,
+   "km_per_1000_people": 1461.47
   },
   {
    "iso": "SVK",
@@ -1806,7 +2122,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 28544.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 12729.5,
+   "km_per_1000km2": 269.92,
+   "km_per_1000_people": 2357.31
   },
   {
    "iso": "KOR",
@@ -1823,7 +2142,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 36227.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 29097.7,
+   "km_per_1000km2": 293.89,
+   "km_per_1000_people": 562.82
   },
   {
    "iso": "AUT",
@@ -1840,7 +2162,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 62930.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 20827.3,
+   "km_per_1000km2": 244.76,
+   "km_per_1000_people": 2263.84
   },
   {
    "iso": "VNM",
@@ -1857,7 +2182,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 5066.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 44664.7,
+   "km_per_1000km2": 132.82,
+   "km_per_1000_people": 439.61
   },
   {
    "iso": "DZA",
@@ -1874,7 +2202,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 6051.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 60619.7,
+   "km_per_1000km2": 26.15,
+   "km_per_1000_people": 1278.9
   },
   {
    "iso": "MYS",
@@ -1891,7 +2222,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 13125.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 44789.5,
+   "km_per_1000km2": 132.58,
+   "km_per_1000_people": 1244.15
   },
   {
    "iso": "JPN",
@@ -1908,7 +2242,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 35951.0,
    "year_access": 2024,
    "year_losses": 2025,
-   "year_kwh": 2025
+   "year_kwh": 2025,
+   "net_km": 93889.1,
+   "km_per_1000km2": 232.21,
+   "km_per_1000_people": 760.85
   },
   {
    "iso": "BGR",
@@ -1925,7 +2262,10 @@ window.TRACKER_DATA = {
    "gdp_pc": 20328.0,
    "year_access": 2024,
    "year_losses": 2024,
-   "year_kwh": 2024
+   "year_kwh": 2024,
+   "net_km": 24181.7,
+   "km_per_1000km2": 219.31,
+   "km_per_1000_people": 3778.39
   }
  ]
 };

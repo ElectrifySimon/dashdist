@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Distribution Grid Dashboard</title>
+<title>DashDist</title>
 <link href="vendor/maplibre-gl.css" rel="stylesheet">
 <style>
 :root{
@@ -85,7 +85,7 @@ td.name{font-weight:500}
 <body>
 
 <section id="lock">
-  <h2>Distribution Grid Dashboard</h2>
+  <h2>DashDist</h2>
   <p>Enter the passphrase to open the panel.</p>
   <input type="password" id="pw" placeholder="Passphrase" autocomplete="off">
   <button id="go">Open</button>
@@ -94,7 +94,7 @@ td.name{font-weight:500}
 
 <div class="wrap" id="app" hidden>
   <header>
-    <h1>Distribution Grid Dashboard</h1>
+    <h1>DashDist</h1>
     <p id="sub"></p>
   </header>
 
@@ -110,6 +110,7 @@ td.name{font-weight:500}
       <option value="access">Colour: access rate</option>
       <option value="unserved_m">Colour: unserved people</option>
       <option value="losses">Colour: T&amp;D losses</option>
+      <option value="km_per_1000km2">Colour: line density</option>
     </select>
     <button class="btn" id="gridtoggle">Grid lines: on</button>
   </div>
@@ -134,6 +135,7 @@ td.name{font-weight:500}
   <div class="tabs">
     <div class="tab on" data-t="access">Access gap</div>
     <div class="tab" data-t="perf">Consumption and losses</div>
+    <div class="tab" data-t="net">Network</div>
     <div class="tab" data-t="cover">Data coverage</div>
   </div>
 
@@ -178,6 +180,12 @@ const COLS = {
     {k:"country",l:"Country",type:"s"},{k:"iso",l:"ISO",type:"s"},
     {k:"year_access",l:"Access year",type:"n",d:0},{k:"year_losses",l:"Loss year",type:"n",d:0},
     {k:"year_kwh",l:"Consumption year",type:"n",d:0},
+  ],
+  net: [
+    {k:"country",l:"Country",type:"s"},{k:"region",l:"Region",type:"s"},
+    {k:"net_km",l:"Predicted network km",type:"n",d:0},
+    {k:"km_per_1000km2",l:"km per 1000 km²",type:"n",d:1},
+    {k:"km_per_1000_people",l:"km per 1000 people",type:"n",d:1},
   ],
 };
 
@@ -286,8 +294,9 @@ const RAMP={
   access:["#6b1f1f","#9c3a32","#c06a34","#c99a3a","#6fae7a","#2f8f6f"],
   unserved_m:["#1d2a33","#28505c","#357f6e","#63b287","#f0a13a","#e05c5c"],
   losses:["#1d2a33","#28505c","#357f6e","#c99a3a","#e07b3a","#e05c5c"],
+  km_per_1000km2:["#1d2a33","#28505c","#357f6e","#63b287","#c9c83a","#f0a13a"],
 };
-const RANGE={access:[0,100],unserved_m:[0,60],losses:[0,30]};
+const RANGE={access:[0,100],unserved_m:[0,60],losses:[0,30],km_per_1000km2:[0,600]};
 
 function hex2rgb(h){return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16),210];}
 function rampColour(metric,v){
@@ -304,7 +313,8 @@ function buildGeo(){
   (GEO.features||[]).forEach(f=>{
     const r=BY_ISO[f.properties.iso]; if(!r) return;
     feats.push({type:"Feature",geometry:f.geometry,
-      properties:{iso:r.iso,access:r.access,unserved_m:r.unserved_m,losses:r.losses}});
+      properties:{iso:r.iso,access:r.access,unserved_m:r.unserved_m,losses:r.losses,
+        km_per_1000km2:r.km_per_1000km2}});
   });
   return {type:"FeatureCollection",features:feats};
 }

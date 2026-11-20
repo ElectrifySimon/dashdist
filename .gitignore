@@ -5,3 +5,4 @@ src/
 build/
 gated/
 data/wdi_raw.json
+data/raw/

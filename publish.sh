@@ -28,8 +28,9 @@ PY
 
 npx --yes staticrypt@3.5.4 build/index.html -p distribution -d gated --remember 0 --short
 
-cp -r data vendor gated/
-rm -f gated/data/targets.tif gated/data/countries_raw.geojson
+mkdir -p gated/data
+cp data/countries.geo.json data/grid_presence.png gated/data/
+cp -r vendor gated/
 cp README.md gated/README.md 2>/dev/null || true
 echo "--- gated tree ---"
 find gated -maxdepth 2 -type f | sort
