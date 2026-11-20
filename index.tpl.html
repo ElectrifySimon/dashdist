@@ -217,13 +217,13 @@ tbody tr{transition:background var(--d-feedback) var(--e-out)}
   <div class="foot" id="foot"></div>
 </div>
 
+<script src="vendor/echarts.min.js"></script>
 <script src="vendor/deck.gl.min.js"></script>
 <script src="data.js"></script>
 <script type="module">
 import * as maplibregl from './vendor/maplibre-gl.mjs';
-import Vizzu from './vendor/vizzu.min.js';
 window.maplibregl = maplibregl;
-window.Vizzu = Vizzu;
+
 
 const PASS = "distribution";
 const STYLE_URL = "https://tiles.openfreemap.org/styles/dark";
@@ -371,92 +371,97 @@ function downloadCsv(){
 }
 
 
-/* ---------- charts: Vizzu 0.18 animated storytelling ---------- */
-let VIZ=null, VSTATE=0, VTIMER=null, VREADY=false;
-
-const VSTATES=[
-  {k:"region",  t:"Unserved people by region", s:"Bar height is millions without access",
-   cfg:{channels:{y:{set:["Unserved"]},x:{set:["Region"]},color:{set:["Region"]}},
-        geometry:"rectangle", legend:"color", coordSystem:"cartesian"}},
-  {k:"country", t:"Unserved by country", s:"The twelve largest access gaps",
-   cfg:{channels:{y:{set:["Unserved"]},x:{set:["Country"]},color:{set:["Unserved"]}},
-        geometry:"rectangle", legend:"color", orientation:"vertical", sort:"byValue", reverse:true}},
-  {k:"loss",    t:"Losses against access", s:"Every country placed by access rate and network losses",
-   cfg:{channels:{x:{set:["Access"]},y:{set:["Losses"]},size:{set:["Population"]},color:{set:["Region"]}},
-        geometry:"circle", legend:"color"}},
-  {k:"density", t:"Line density leaders", s:"Predicted network km per 1,000 km2",
-   cfg:{channels:{y:{set:["Density"]},x:{set:["Country"]},color:{set:["Density"]}},
-        geometry:"rectangle", legend:"color", orientation:"vertical", sort:"byValue", reverse:true}},
-  {k:"mix",     t:"Everyone, all at once", s:"Regions stacked by population, sized by density",
-   cfg:{channels:{y:{set:["Population"]},x:{set:["Region"]},color:{set:["Region"]},size:{set:["Density"]}},
-        geometry:"circle", legend:"color"}},
-];
-
-function vizzuRecords(rows,state){
-  let rs=rows;
-  if(state==="country") rs=rows.slice().sort((a,b)=>b.unserved_m-a.unserved_m).slice(0,12);
-  if(state==="density") rs=rows.filter(r=>r.km_per_1000km2!=null).slice().sort((a,b)=>b.km_per_1000km2-a.km_per_1000km2).slice(0,12);
-  return rs.map(r=>({
-    Country:r.country, Region:(r.region||"Other").trim(),
-    Unserved:Math.round(r.unserved_m*10)/10,
-    Density:Math.round((r.km_per_1000km2||0)*10)/10,
-    Access:r.access, Losses:r.losses, Population:r.pop_m
-  }));
+/* ---------- charts: Apache ECharts 6.1, four panels ---------- */
+let CHARTS=[];
+function disposeCharts(){CHARTS.forEach(c=>{try{c.dispose()}catch(e){}});CHARTS=[];}
+const CMUTED="#8fa3b5", CLINE="#1e2a36", CINK="#dfe8f1";
+function base(){return{
+  backgroundColor:"transparent",
+  textStyle:{fontFamily:"Inter,system-ui,-apple-system,Segoe UI,sans-serif",color:CMUTED},
+  animationDuration:700, animationEasing:"cubicOut",
+  grid:{left:10,right:16,top:12,bottom:10,containLabel:true}
+};}
+function axT(){return{axisLine:{lineStyle:{color:CLINE}},axisTick:{show:false},
+  axisLabel:{color:CMUTED,fontSize:11},splitLine:{lineStyle:{color:CLINE,opacity:.55}}};}
+function mk(id,opt){
+  const el=document.getElementById(id); if(!el) return;
+  const c=echarts.init(el,null,{renderer:"canvas"});
+  c.setOption(Object.assign(base(),opt)); CHARTS.push(c);
 }
-
 function drawCharts(){
   const rows=filtered();
   const el=document.getElementById("charts");
   if(!el.dataset.built){
     el.dataset.built="1";
-    el.innerHTML=`<div class="card hero">
-      <h3 id="vtitle"></h3><p id="vsub"></p>
-      <div class="plot heroplot" id="vizzu"></div>
-      <div class="chips" id="chips">${VSTATES.map((v,i)=>
-        `<button class="chip${i===0?' on':''}" data-s="${i}">${v.t}</button>`).join("")}</div>
-    </div>`;
-    el.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{vshow(+b.dataset.s,true);});
-    requestAnimationFrame(()=>vinit(rows));
-  } else {
-    vrefresh(rows);
+    el.innerHTML=[
+      ["ch1","Unserved people by region","Millions without electricity"],
+      ["ch2","Line density leaders","km of predicted network per 1,000 km2"],
+      ["ch3","Access against density","Bubble size is population, colour is losses"],
+      ["ch4","Unserved by country","Area scaled to people, top 24"]
+    ].map(([id,t,sub])=>`<div class="card"><h3>${t}</h3><p>${sub}</p><div class="plot" id="${id}"></div></div>`).join("");
   }
+  disposeCharts();
+  requestAnimationFrame(()=>{cRegions(rows);cDensity(rows);cScatter(rows);cTree(rows);});
 }
-
-function vinit(rows){
-  const box=document.getElementById("vizzu");
-  VIZ=new Vizzu(box,{});
-  VREADY=true; VSTATE=0;
-  VIZ.animate({style:{
-      backgroundColor:"rgb(15,21,28)",
-      plot:{backgroundColor:"rgb(15,21,28)",
-        marker:{colorPalette:"#22d3ee #0891b2 #67e8f9 #fbbf24 #f59e0b #d97706 #a3e635 #ef4444"}},
-      fontFamily:"Inter, system-ui, sans-serif"
-  }}).catch(e=>{window.__verr=String(e).slice(0,160);});
-  VIZ.animate({data:{series:[
-      {name:"Country",type:"dimension"},{name:"Region",type:"dimension"},
-      {name:"Unserved",type:"measure"},{name:"Density",type:"measure"},
-      {name:"Access",type:"measure"},{name:"Losses",type:"measure"},
-      {name:"Population",type:"measure"}],
-    records:vizzuRecords(rows,VSTATES[0].k)}});
-  vshow(0,false);
+function cRegions(rows){
+  const agg={};
+  rows.forEach(r=>{const k=(r.region||"Other").trim();agg[k]=(agg[k]||0)+r.unserved_m;});
+  const top=Object.entries(agg).sort((a,b)=>b[1]-a[1]).slice(0,8).reverse();
+  mk("ch1",{
+    tooltip:{trigger:"axis",axisPointer:{type:"shadow"},backgroundColor:"rgba(12,17,23,.96)",
+      borderColor:CLINE,textStyle:{color:CINK,fontSize:12},
+      formatter:p=>`<b>${p[0].name}</b><br>${Math.round(p[0].value)} million`},
+    xAxis:Object.assign({type:"value"},axT(),{splitLine:{show:false}}),
+    yAxis:Object.assign({type:"category",data:top.map(d=>d[0])},axT(),{splitLine:{show:false}}),
+    series:[{type:"bar",data:top.map(d=>Math.round(d[1])),barWidth:"58%",
+      itemStyle:{borderRadius:[0,4,4,0],color:{type:"linear",x:0,y:0,x2:1,y2:0,
+        colorStops:[{offset:0,color:"#0e7490"},{offset:1,color:"#22d3ee"}]}},
+      label:{show:true,position:"right",color:CINK,fontSize:11,formatter:p=>Math.round(p.value)},
+      animationDelay:i=>i*50}]
+  });
 }
-
-function vshow(i,manual){
-  if(!VIZ) return;
-  VSTATE=i;
-  const st=VSTATES[i], rows=filtered();
-  document.getElementById("vtitle").textContent=st.t;
-  document.getElementById("vsub").textContent=st.s;
-  document.querySelectorAll("#chips .chip").forEach((b,j)=>b.classList.toggle("on",j===i));
-  VIZ.animate({data:{records:vizzuRecords(rows,st.k)}});
-  VIZ.animate({config:st.cfg,duration:1.1,easing:"cubicInOut"});
-  if(manual) clearInterval(VTIMER), VTIMER=null;
-  if(!VTIMER) VTIMER=setInterval(()=>vshow((VSTATE+1)%VSTATES.length,false),8000);
+function cDensity(rows){
+  const top=rows.filter(r=>r.km_per_1000km2!=null).sort((a,b)=>b.km_per_1000km2-a.km_per_1000km2).slice(0,10).reverse();
+  mk("ch2",{
+    tooltip:{trigger:"axis",axisPointer:{type:"shadow"},backgroundColor:"rgba(12,17,23,.96)",
+      borderColor:CLINE,textStyle:{color:CINK,fontSize:12},
+      formatter:p=>`<b>${p[0].name}</b><br>${Math.round(p[0].value)} km per 1,000 km2`},
+    xAxis:Object.assign({type:"value"},axT(),{splitLine:{show:false}}),
+    yAxis:Object.assign({type:"category",data:top.map(r=>r.country)},axT(),{splitLine:{show:false}}),
+    series:[{type:"bar",data:top.map(r=>Math.round(r.km_per_1000km2)),barWidth:"58%",
+      itemStyle:{borderRadius:[0,4,4,0],color:{type:"linear",x:0,y:0,x2:1,y2:0,
+        colorStops:[{offset:0,color:"#0f766e"},{offset:1,color:"#a3e635"}]}},
+      label:{show:true,position:"right",color:CINK,fontSize:11,formatter:p=>Math.round(p.value)},
+      animationDelay:i=>i*50}]
+  });
 }
-
-function vrefresh(rows){
-  if(!VIZ) return;
-  VIZ.animate({data:{records:vizzuRecords(rows,VSTATES[VSTATE].k)}});
+function cScatter(rows){
+  const pts=rows.filter(r=>r.access!=null&&r.km_per_1000km2!=null);
+  mk("ch3",{
+    tooltip:{backgroundColor:"rgba(12,17,23,.96)",borderColor:CLINE,textStyle:{color:CINK,fontSize:12},
+      formatter:p=>`<b>${p.data[2]}</b><br>Access ${p.data[0]}%<br>Density ${Math.round(p.data[1])}<br>Losses ${p.data[3]==null?"n/a":p.data[3]+"%"}`},
+    grid:{left:10,right:18,top:18,bottom:26,containLabel:true},
+    xAxis:Object.assign({type:"value",min:0,max:100,name:"access %",nameTextStyle:{color:"#6b7c8d",fontSize:10}},axT()),
+    yAxis:Object.assign({type:"value",name:"km per 1,000 km2",nameTextStyle:{color:"#6b7c8d",fontSize:10}},axT()),
+    visualMap:{show:false,min:0,max:30,dimension:3,inRange:{color:["#22d3ee","#a3e635","#fbbf24","#ef4444"]}},
+    series:[{type:"scatter",data:pts.map(r=>[r.access,r.km_per_1000km2,r.country,r.losses,r.pop_m]),
+      symbolSize:d=>Math.max(5,Math.min(24,Math.sqrt(d[4]||1)*1.6)),
+      itemStyle:{opacity:.8,borderColor:"#0b1117",borderWidth:.6},
+      emphasis:{itemStyle:{opacity:1,borderColor:"#fff",borderWidth:1}}}]
+  });
+}
+function cTree(rows){
+  const top=rows.filter(r=>r.unserved_m>0).sort((a,b)=>b.unserved_m-a.unserved_m).slice(0,24);
+  mk("ch4",{
+    tooltip:{backgroundColor:"rgba(12,17,23,.96)",borderColor:CLINE,textStyle:{color:CINK,fontSize:12},
+      formatter:p=>`<b>${p.name}</b><br>${p.value.toFixed(1)} million unserved`},
+    series:[{type:"treemap",roam:false,nodeClick:false,breadcrumb:{show:false},
+      left:0,right:0,top:0,bottom:0,
+      itemStyle:{borderColor:"#0b1117",borderWidth:2,gapWidth:2,borderRadius:4},
+      label:{show:true,color:"#06121a",fontSize:11,fontWeight:600},
+      color:["#22d3ee","#0891b2","#67e8f9","#0e7490","#fbbf24","#f59e0b","#d97706","#a3e635"],
+      data:top.map(r=>({name:r.country,value:Math.max(.4,r.unserved_m)}))}]
+  });
 }
 /* ---------- map ---------- */
 const RAMP={
@@ -549,7 +554,7 @@ function initMap(){
 
     MAP.on("load",()=>{
       MAP.addSource("gridpresence",{type:"image",url:"data/density.png",
-        coordinates:[[-178.277,75.002],[178.619,75.002],[178.619,-55.973],[-178.277,-55.973]]});
+        coordinates:[[-180,90],[180,90],[180,-90],[-180,-90]]});
       MAP.addLayer({id:"gp",type:"raster",source:"gridpresence",
         paint:{"raster-opacity":["interpolate",["linear"],["zoom"],2.4,0.95,3.6,0.55,4.4,0.0],
                "raster-fade-duration":0,"raster-resampling":"linear"}});
@@ -684,11 +689,16 @@ document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
   const csv=document.getElementById("csv"); if(csv) csv.style.display = TAB==="charts" ? "none" : "";
   if(COLS[TAB]) SORT={key:COLS[TAB][0].k,dir:1};
   render();
+  if(TAB!=="charts") requestAnimationFrame(()=>{try{MAP.resize()}catch(e){}});
 });
 document.getElementById("q").oninput=render;
 document.getElementById("region").onchange=render;
 document.getElementById("income").onchange=render;
 document.getElementById("csv").onclick=downloadCsv;
+window.addEventListener("resize",()=>{
+  if(CHARTS.length) CHARTS.forEach(c=>{try{c.resize()}catch(e){}});
+  try{MAP.resize()}catch(e){}
+});
 
 /* GATE-START */
 document.getElementById("go").onclick=()=>{
