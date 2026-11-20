@@ -66,6 +66,7 @@ for z, (tol, minlen, dec) in LEVELS.items():
     d = os.path.join(OUT, str(z))
     os.makedirs(d, exist_ok=True)
     total = 0
+    written = 0
     for (tx, ty), gs in buckets[z].items():
         lon1, lat1, lon2, lat2 = tile_bounds(tx, ty, z)
         pad_lon = (lon2 - lon1) * 0.02
@@ -97,7 +98,7 @@ for z, (tol, minlen, dec) in LEVELS.items():
         p = os.path.join(d, f"{tx}_{ty}.json")
         txt = json.dumps({"type": "MultiLineString", "coordinates": coords}, separators=(",", ":"))
         open(p, "w").write(txt)
-        total += len(txt)
-    print("z%d wrote %d files %.1f MB" % (z, len(buckets[z]), total / 1e6), flush=True)
+        total += len(txt); written += 1
+    print("z%d wrote %d files (of %d touched) %.1f MB" % (z, written, len(buckets[z]), total / 1e6), flush=True)
 
 print("done %.1fs" % (time.time() - t0))
