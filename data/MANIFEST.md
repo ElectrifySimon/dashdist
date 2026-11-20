@@ -73,6 +73,6 @@ tiles, above that level 5. Tiles are cached in the browser per session.
 |---|---|---|
 | `vendor/maplibre-gl.mjs` + worker + css | 6.19.0 | BSD-3-Clause |
 | `vendor/deck.gl.min.js` | 9.4.1 | MIT |
-| `vendor/echarts.min.js` | 6.1.0 | Apache-2.0 (1,121,883 bytes) |
+| `vendor/vizzu.min.js` + `vendor/cvizzu.wasm` | 0.18.0 | Apache-2.0 (61,404 + 399,475 bytes) |
 
-All three are served from the site. No CDN and no API key at runtime.
+All of these are served from the site. No CDN and no API key at runtime.
