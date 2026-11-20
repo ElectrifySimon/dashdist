@@ -1,0 +1,277 @@
+[
+ {
+  "q": "mcp server map visualization",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "mapbox mcp server github",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "google maps mcp server official",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "arcgis mcp server esri",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "leaflet mcp server",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "openlayers mcp server",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "maplibre mcp server",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "deck.gl mcp server",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "cesium mcp server 3d globe",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "kepler.gl mcp server",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "globe.gl mcp server",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "three.js mcp server globe",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "qgis mcp server",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "postgis mcp server",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "geoserver mcp server",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "turf.js mcp server geospatial",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "geospatial mcp server list",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "model context protocol geospatial servers",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "openstreetmap mcp server",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "nominatim mcp server",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "h3 geospatial mcp server",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "google earth engine mcp server",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "blender mcp server",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "mapbox mcp 3d terrain",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "mcp server choropleth map",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "mcp server interactive map dashboard",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "mcp server basemap tiles",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "maptiler mcp server",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "protomaps mcp server",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "mcp geospatial analysis server github",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "OpenStreetMap power distribution substation coverage",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "gridfinder distribution grid dataset",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "Global Electrification Platform ESMAP data",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "Energy Access Explorer WRI API",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "IEA electricity grids dataset download",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "World Bank utility performance database distribution",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "DSO open data network capacity map",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "hosting capacity map open data DSO",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "SAIDI SAIFI dataset by country",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "distribution losses dataset technical commercial country",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "smart meter penetration by country dataset",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "global power system dataset open source",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "Open Infrastructure Map power",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "grid3 global grid dataset",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "electricity distribution network open data Africa",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "Nigeria DisCo grid map open data",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "India DISCOM open data portal",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "ANEEL distribution data open Brazil",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "Enedis open data network",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "GIS distribution network shapefile open data",
+  "results": [],
+  "error": null
+ },
+ {
+  "q": "low voltage network open dataset",
+  "results": [],
+  "error": "HTTP Error 403: Forbidden"
+ },
+ {
+  "q": "distribution transformer capacity dataset",
+  "results": [],
+  "error": "HTTP Error 403: Forbidden"
+ },
+ {
+  "q": "Africa Energy Portal data World Bank",
+  "results": [],
+  "error": "HTTP Error 403: Forbidden"
+ },
+ {
+  "q": "IRENA grid statistics data",
+  "results": [],
+  "error": "HTTP Error 403: Forbidden"
+ },
+ {
+  "q": "electricity distribution map open data global",
+  "results": [],
+  "error": "HTTP Error 403: Forbidden"
+ }
+]

@@ -1,0 +1,2356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Distribution Grid Dashboard</title>
+<link href="vendor/maplibre-gl.css" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0e13; --panel:#141a22; --panel2:#1b232e; --line:#27313e;
+  --ink:#e8eef5; --muted:#8a97a7; --accent:#4cc2a0; --accent2:#f0a13a; --bad:#e05c5c;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1360px;margin:0 auto;padding:24px 18px 64px}
+header h1{font-size:25px;margin:0 0 4px;letter-spacing:-.4px}
+header p{margin:0;color:var(--muted);font-size:13.5px}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:18px 0}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.kpi .n{font-size:20px;font-weight:650}
+.kpi .l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:3px}
+.mapbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0 8px}
+.seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{background:transparent;border:0;color:var(--muted);padding:8px 15px;font-size:13px;cursor:pointer}
+.seg button.on{background:var(--accent);color:#07110d;font-weight:650}
+select,input[type=search],.btn{background:var(--panel);border:1px solid var(--line);color:var(--ink);
+  border-radius:8px;padding:8px 11px;font-size:13px;outline:none}
+.btn{cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+#map{height:560px;border:1px solid var(--line);border-radius:10px;overflow:hidden;position:relative}
+.mapnote{position:absolute;left:12px;bottom:12px;z-index:2;background:rgba(11,14,19,.86);
+  border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:11px;color:var(--muted)}
+.legend{position:absolute;right:12px;bottom:12px;z-index:2;background:rgba(11,14,19,.86);
+  border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--muted)}
+.legend .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:middle}
+#panel{position:absolute;top:12px;right:12px;z-index:3;width:252px;background:rgba(20,26,34,.97);
+  border:1px solid var(--line);border-radius:10px;padding:13px;font-size:12px;display:none}
+#panel h3{margin:0 0 9px;font-size:14px}
+#panel .row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--line)}
+#panel .row:last-child{border:0}
+#panel .k{color:var(--muted)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 12px;align-items:center}
+input[type=search]{flex:1;min-width:190px}
+input[type=search]:focus,select:focus{border-color:var(--accent)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tab{background:var(--panel);border:1px solid var(--line);color:var(--muted);
+  padding:7px 13px;border-radius:8px;font-size:13px;cursor:pointer}
+.tab.on{background:var(--accent);color:#07110d;border-color:var(--accent);font-weight:650}
+.tblwrap{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap}
+th,td{padding:8px 11px;text-align:right;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th:nth-child(2),td:nth-child(2){text-align:left}
+th{position:sticky;top:0;background:var(--panel2);color:var(--muted);font-weight:600;
+  font-size:10px;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;user-select:none}
+th:hover{color:var(--ink)}
+th .ar{opacity:.4;font-size:9px;margin-left:4px}
+th.sorted .ar{opacity:1;color:var(--accent)}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--panel2)}
+td.name{font-weight:500}
+.pill{display:inline-block;padding:2px 7px;border-radius:99px;font-size:10px;
+  border:1px solid var(--line);color:var(--muted)}
+.bad{color:var(--bad)} .warn{color:var(--accent2)}
+.foot{margin-top:24px;color:var(--muted);font-size:12px;line-height:1.75}
+.foot code{background:var(--panel);padding:1px 5px;border-radius:4px}
+.count{color:var(--muted);font-size:12px;margin-left:auto}
+#lock{max-width:370px;margin:16vh auto;background:var(--panel);border:1px solid var(--line);
+  border-radius:12px;padding:30px}
+#lock h2{margin:0 0 6px;font-size:19px}
+#lock p{margin:0 0 18px;color:var(--muted);font-size:13px}
+#lock input{width:100%;margin-bottom:10px;background:var(--bg);border:1px solid var(--line);
+  color:var(--ink);border-radius:8px;padding:10px 12px;font-size:14px}
+#lock button{width:100%;background:var(--accent);border:0;color:#07110d;font-weight:650;
+  padding:11px;border-radius:8px;font-size:14px;cursor:pointer}
+#err{color:var(--bad);font-size:12px;min-height:16px;margin-top:8px}
+.maplibregl-popup-content{background:#141a22;color:#e8eef5;border:1px solid #27313e;
+  border-radius:8px;font-size:12px;font-family:inherit}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}#map{height:420px}}
+@media(max-width:620px){.kpis{grid-template-columns:repeat(2,1fr)}.wrap{padding:16px 10px 40px}}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="app">
+  <header>
+    <h1>Distribution Grid Dashboard</h1>
+    <p id="sub"></p>
+  </header>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="mapbar">
+    <div class="seg" id="mode">
+      <button data-m="2d" class="on">2D</button>
+      <button data-m="3d">3D</button>
+      <button data-m="globe">Globe</button>
+    </div>
+    <select id="metric">
+      <option value="access">Colour: access rate</option>
+      <option value="unserved_m">Colour: unserved people</option>
+      <option value="losses">Colour: T&amp;D losses</option>
+    </select>
+    <button class="btn" id="gridtoggle">Grid lines: on</button>
+  </div>
+
+  <div id="map">
+    <div id="panel"></div>
+    <div class="mapnote" id="mapnote"></div>
+    <div class="legend">
+      <div><span class="sw" style="background:#4cc2a0"></span>gridfinder predicted</div>
+      <div><span class="sw" style="background:#f0a13a"></span>OpenStreetMap mapped</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <input type="search" id="q" placeholder="Search country or region">
+    <select id="region"><option value="">All regions</option></select>
+    <select id="income"><option value="">All income groups</option></select>
+    <button class="btn" id="csv">Download CSV</button>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div class="tabs">
+    <div class="tab on" data-t="access">Access gap</div>
+    <div class="tab" data-t="perf">Consumption and losses</div>
+    <div class="tab" data-t="cover">Data coverage</div>
+  </div>
+
+  <div class="tblwrap">
+    <table>
+      <thead id="thead"></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="foot" id="foot"></div>
+</div>
+
+<script src="vendor/maplibre-gl.js"></script>
+<script>window.TRACKER_DATA = {
+ "meta": {
+  "title": "Distribution Grid Dashboard",
+  "subtitle": "Country panel: access, consumption and network losses",
+  "as_of": "2026-11-20",
+  "note": "All figures from World Bank World Development Indicators, latest available year 2010-2025. Unserved population is derived (population x (1 - access rate)). Year columns show the observation year for each series."
+ },
+ "rows": [
+  {
+   "iso": "NGA",
+   "country": "Nigeria",
+   "region": "Sub-Saharan Africa ",
+   "income": "Lower middle income",
+   "pop_m": 237.5,
+   "access": 62.5,
+   "urban": 85.5,
+   "rural": 23.5,
+   "unserved_m": 89.07,
+   "kwh_pc": 141.0,
+   "losses": 14.1,
+   "gdp_pc": 1224.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "COD",
+   "country": "Congo, Dem. Rep.",
+   "region": "Sub-Saharan Africa ",
+   "income": "Low income",
+   "pop_m": 112.8,
+   "access": 22.5,
+   "urban": 55.0,
+   "rural": 1.0,
+   "unserved_m": 87.45,
+   "kwh_pc": 127.0,
+   "losses": 9.1,
+   "gdp_pc": 807.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "ETH",
+   "country": "Ethiopia",
+   "region": "Sub-Saharan Africa ",
+   "income": "Low income",
+   "pop_m": 135.5,
+   "access": 56.6,
+   "urban": 95.1,
+   "rural": 44.8,
+   "unserved_m": 58.79,
+   "kwh_pc": 157.0,
+   "losses": 20.7,
+   "gdp_pc": 933.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "TZA",
+   "country": "Tanzania",
+   "region": "Sub-Saharan Africa ",
+   "income": "Lower middle income",
+   "pop_m": 70.5,
+   "access": 52.4,
+   "urban": 85.2,
+   "rural": 33.7,
+   "unserved_m": 33.58,
+   "kwh_pc": 171.0,
+   "losses": 12.4,
+   "gdp_pc": 1319.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "UGA",
+   "country": "Uganda",
+   "region": "Sub-Saharan Africa ",
+   "income": "Low income",
+   "pop_m": 51.4,
+   "access": 55.3,
+   "urban": 78.3,
+   "rural": 44.8,
+   "unserved_m": 22.97,
+   "kwh_pc": 99.0,
+   "losses": 19.4,
+   "gdp_pc": 1206.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "MOZ",
+   "country": "Mozambique",
+   "region": "Sub-Saharan Africa ",
+   "income": "Low income",
+   "pop_m": 35.6,
+   "access": 36.9,
+   "urban": 79.8,
+   "rural": 12.3,
+   "unserved_m": 22.48,
+   "kwh_pc": 390.0,
+   "losses": 14.4,
+   "gdp_pc": 627.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "NER",
+   "country": "Niger",
+   "region": "Sub-Saharan Africa ",
+   "income": "Low income",
+   "pop_m": 27.9,
+   "access": 21.3,
+   "urban": 69.1,
+   "rural": 10.8,
+   "unserved_m": 21.97,
+   "kwh_pc": 64.0,
+   "losses": 13.7,
+   "gdp_pc": 775.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "MDG",
+   "country": "Madagascar",
+   "region": "Sub-Saharan Africa ",
+   "income": "Low income",
+   "pop_m": 32.7,
+   "access": 42.5,
+   "urban": 75.9,
+   "rural": 26.5,
+   "unserved_m": 18.83,
+   "kwh_pc": 77.0,
+   "losses": 5.3,
+   "gdp_pc": 599.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "TCD",
+   "country": "Chad",
+   "region": "Sub-Saharan Africa ",
+   "income": "Low income",
+   "pop_m": 21.0,
+   "access": 13.4,
+   "urban": 51.0,
+   "rural": 100.0,
+   "unserved_m": 18.19,
+   "kwh_pc": 13.0,
+   "losses": 25.4,
+   "gdp_pc": 1022.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "SDN",
+   "country": "Sudan",
+   "region": "Sub-Saharan Africa ",
+   "income": "Low income",
+   "pop_m": 51.7,
+   "access": 66.0,
+   "urban": 87.9,
+   "rural": 54.2,
+   "unserved_m": 17.57,
+   "kwh_pc": 192.0,
+   "losses": 31.3,
+   "gdp_pc": 1165.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "AGO",
+   "country": "Angola",
+   "region": "Sub-Saharan Africa ",
+   "income": "Lower middle income",
+   "pop_m": 39.0,
+   "access": 55.5,
+   "urban": 78.0,
+   "rural": 1.3,
+   "unserved_m": 17.37,
+   "kwh_pc": 353.0,
+   "losses": 11.3,
+   "gdp_pc": 3129.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "BFA",
+   "country": "Burkina Faso",
+   "region": "Sub-Saharan Africa ",
+   "income": "Low income",
+   "pop_m": 24.1,
+   "access": 34.0,
+   "urban": 87.8,
+   "rural": 12.7,
+   "unserved_m": 15.89,
+   "kwh_pc": 145.0,
+   "losses": 12.7,
+   "gdp_pc": 1148.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "KEN",
+   "country": "Kenya",
+   "region": "Sub-Saharan Africa ",
+   "income": "Lower middle income",
+   "pop_m": 57.5,
+   "access": 77.0,
+   "urban": 98.1,
+   "rural": 67.1,
+   "unserved_m": 13.23,
+   "kwh_pc": 195.0,
+   "losses": 25.8,
+   "gdp_pc": 2363.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "SSD",
+   "country": "South Sudan",
+   "region": "Sub-Saharan Africa ",
+   "income": "Low income",
+   "pop_m": 12.2,
+   "access": 5.4,
+   "urban": 22.8,
+   "rural": 0.7,
+   "unserved_m": 11.53,
+   "kwh_pc": 53.0,
+   "losses": 4.2,
+   "gdp_pc": 1080.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "PAK",
+   "country": "Pakistan",
+   "region": "Middle East, North Africa, Afghanistan & Pakistan",
+   "income": "Lower middle income",
+   "pop_m": 255.2,
+   "access": 95.7,
+   "urban": 98.4,
+   "rural": 94.0,
+   "unserved_m": 10.97,
+   "kwh_pc": 493.0,
+   "losses": 15.2,
+   "gdp_pc": 1596.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "MMR",
+   "country": "Myanmar",
+   "region": "East Asia & Pacific",
+   "income": "Lower middle income",
+   "pop_m": 54.9,
+   "access": 80.4,
+   "urban": 95.3,
+   "rural": 73.9,
+   "unserved_m": 10.75,
+   "kwh_pc": 296.0,
+   "losses": 7.2,
+   "gdp_pc": 1489.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "ZMB",
+   "country": "Zambia",
+   "region": "Sub-Saharan Africa ",
+   "income": "Lower middle income",
+   "pop_m": 21.9,
+   "access": 53.6,
+   "urban": 80.3,
+   "rural": 31.3,
+   "unserved_m": 10.17,
+   "kwh_pc": 514.0,
+   "losses": 19.2,
+   "gdp_pc": 1318.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "CIV",
+   "country": "Cote d'Ivoire",
+   "region": "Sub-Saharan Africa ",
+   "income": "Lower middle income",
+   "pop_m": 32.7,
+   "access": 72.9,
+   "urban": 94.3,
+   "rural": 47.7,
+   "unserved_m": 8.86,
+   "kwh_pc": 366.0,
+   "losses": 13.7,
+   "gdp_pc": 3050.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "CMR",
+   "country": "Cameroon",
+   "region": "Sub-Saharan Africa ",
+   "income": "Lower middle income",
+   "pop_m": 29.9,
+   "access": 72.0,
+   "urban": 95.6,
+   "rural": 42.7,
+   "unserved_m": 8.37,
+   "kwh_pc": 202.0,
+   "losses": 24.8,
+   "gdp_pc": 1972.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "ZWE",
+   "country": "Zimbabwe",
+   "region": "Sub-Saharan Africa ",
+   "income": "Lower middle income",
+   "pop_m": 17.0,
+   "access": 62.0,
+   "urban": 85.1,
+   "rural": 46.6,
+   "unserved_m": 6.44,
+   "kwh_pc": 553.0,
+   "losses": 20.7,
+   "gdp_pc": 3021.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "ZAF",
+   "country": "South Africa",
+   "region": "Sub-Saharan Africa ",
+   "income": "Upper middle income",
+   "pop_m": 64.7,
+   "access": 90.2,
+   "urban": 92.4,
+   "rural": 86.3,
+   "unserved_m": 6.35,
+   "kwh_pc": 3308.0,
+   "losses": 9.8,
+   "gdp_pc": 6598.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "BEN",
+   "country": "Benin",
+   "region": "Sub-Saharan Africa ",
+   "income": "Lower middle income",
+   "pop_m": 14.8,
+   "access": 59.0,
+   "urban": 71.6,
+   "rural": 45.0,
+   "unserved_m": 6.07,
+   "kwh_pc": 123.0,
+   "losses": 60.9,
+   "gdp_pc": 1658.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "PHL",
+   "country": "Philippines",
+   "region": "East Asia & Pacific",
+   "income": "Upper middle income",
+   "pop_m": 116.8,
+   "access": 94.8,
+   "urban": 99.8,
+   "rural": 88.5,
+   "unserved_m": 6.07,
+   "kwh_pc": 988.0,
+   "losses": 9.8,
+   "gdp_pc": 4171.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "YEM",
+   "country": "Yemen, Rep.",
+   "region": "Middle East, North Africa, Afghanistan & Pakistan",
+   "income": "Low income",
+   "pop_m": 41.8,
+   "access": 86.3,
+   "urban": 95.0,
+   "rural": 81.3,
+   "unserved_m": 5.72,
+   "kwh_pc": 99.0,
+   "losses": 27.6,
+   "gdp_pc": 634.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "HTI",
+   "country": "Haiti",
+   "region": "Latin America & Caribbean ",
+   "income": "Lower middle income",
+   "pop_m": 11.9,
+   "access": 53.9,
+   "urban": 85.6,
+   "rural": 15.0,
+   "unserved_m": 5.49,
+   "kwh_pc": 63.0,
+   "losses": 15.3,
+   "gdp_pc": 2694.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "RWA",
+   "country": "Rwanda",
+   "region": "Sub-Saharan Africa ",
+   "income": "Low income",
+   "pop_m": 14.6,
+   "access": 72.0,
+   "urban": 88.0,
+   "rural": 65.2,
+   "unserved_m": 4.08,
+   "kwh_pc": 79.0,
+   "losses": 14.9,
+   "gdp_pc": 1124.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "TGO",
+   "country": "Togo",
+   "region": "Sub-Saharan Africa ",
+   "income": "Lower middle income",
+   "pop_m": 8.6,
+   "access": 61.1,
+   "urban": 96.0,
+   "rural": 33.9,
+   "unserved_m": 3.34,
+   "kwh_pc": 242.0,
+   "losses": 28.1,
+   "gdp_pc": 1384.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "SEN",
+   "country": "Senegal",
+   "region": "Sub-Saharan Africa ",
+   "income": "Lower middle income",
+   "pop_m": 18.9,
+   "access": 82.9,
+   "urban": 95.7,
+   "rural": 67.1,
+   "unserved_m": 3.24,
+   "kwh_pc": 419.0,
+   "losses": 16.5,
+   "gdp_pc": 1955.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "COG",
+   "country": "Congo, Rep.",
+   "region": "Sub-Saharan Africa ",
+   "income": "Lower middle income",
+   "pop_m": 6.5,
+   "access": 53.0,
+   "urban": 72.0,
+   "rural": 19.4,
+   "unserved_m": 3.05,
+   "kwh_pc": 271.0,
+   "losses": 51.3,
+   "gdp_pc": 2515.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "GHA",
+   "country": "Ghana",
+   "region": "Sub-Saharan Africa ",
+   "income": "Lower middle income",
+   "pop_m": 35.1,
+   "access": 91.9,
+   "urban": 98.6,
+   "rural": 82.6,
+   "unserved_m": 2.84,
+   "kwh_pc": 598.0,
+   "losses": 11.5,
+   "gdp_pc": 3257.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "SYR",
+   "country": "Syrian Arab Republic",
+   "region": "Middle East, North Africa, Afghanistan & Pakistan",
+   "income": "Low income",
+   "pop_m": 25.6,
+   "access": 89.3,
+   "urban": 100.0,
+   "rural": 61.6,
+   "unserved_m": 2.74,
+   "kwh_pc": 660.0,
+   "losses": 18.6,
+   "gdp_pc": 1057.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "GTM",
+   "country": "Guatemala",
+   "region": "Latin America & Caribbean ",
+   "income": "Upper middle income",
+   "pop_m": 18.7,
+   "access": 90.9,
+   "urban": 99.2,
+   "rural": 80.4,
+   "unserved_m": 1.7,
+   "kwh_pc": 743.0,
+   "losses": 13.2,
+   "gdp_pc": 6598.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "LBY",
+   "country": "Libya",
+   "region": "Middle East, North Africa, Afghanistan & Pakistan",
+   "income": "Upper middle income",
+   "pop_m": 7.5,
+   "access": 77.4,
+   "urban": 100.0,
+   "rural": 0.8,
+   "unserved_m": 1.69,
+   "kwh_pc": 5156.0,
+   "losses": 20.2,
+   "gdp_pc": 6449.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "IND",
+   "country": "India",
+   "region": "South Asia",
+   "income": "Lower middle income",
+   "pop_m": 1463.9,
+   "access": 99.9,
+   "urban": 100.0,
+   "rural": 99.9,
+   "unserved_m": 1.46,
+   "kwh_pc": 1223.0,
+   "losses": 14.5,
+   "gdp_pc": 2702.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "PER",
+   "country": "Peru",
+   "region": "Latin America & Caribbean ",
+   "income": "Upper middle income",
+   "pop_m": 34.6,
+   "access": 96.5,
+   "urban": 99.0,
+   "rural": 82.1,
+   "unserved_m": 1.21,
+   "kwh_pc": 1637.0,
+   "losses": 11.6,
+   "gdp_pc": 9684.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "BGD",
+   "country": "Bangladesh",
+   "region": "South Asia",
+   "income": "Lower middle income",
+   "pop_m": 175.7,
+   "access": 99.5,
+   "urban": 99.5,
+   "rural": 99.6,
+   "unserved_m": 0.88,
+   "kwh_pc": 632.0,
+   "losses": 8.2,
+   "gdp_pc": 2597.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "NIC",
+   "country": "Nicaragua",
+   "region": "Latin America & Caribbean ",
+   "income": "Lower middle income",
+   "pop_m": 7.0,
+   "access": 88.7,
+   "urban": 100.0,
+   "rural": 72.2,
+   "unserved_m": 0.79,
+   "kwh_pc": 647.0,
+   "losses": 26.6,
+   "gdp_pc": 3173.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "ARG",
+   "country": "Argentina",
+   "region": "Latin America & Caribbean ",
+   "income": "Upper middle income",
+   "pop_m": 45.9,
+   "access": 98.4,
+   "urban": 100.0,
+   "rural": 79.8,
+   "unserved_m": 0.73,
+   "kwh_pc": 2835.0,
+   "losses": 21.5,
+   "gdp_pc": 14898.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "NPL",
+   "country": "Nepal",
+   "region": "South Asia",
+   "income": "Lower middle income",
+   "pop_m": 29.6,
+   "access": 97.9,
+   "urban": 99.7,
+   "rural": 94.2,
+   "unserved_m": 0.62,
+   "kwh_pc": 389.0,
+   "losses": 13.4,
+   "gdp_pc": 1536.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "COL",
+   "country": "Colombia",
+   "region": "Latin America & Caribbean ",
+   "income": "Upper middle income",
+   "pop_m": 53.4,
+   "access": 98.9,
+   "urban": 99.9,
+   "rural": 95.2,
+   "unserved_m": 0.59,
+   "kwh_pc": 1636.0,
+   "losses": 6.7,
+   "gdp_pc": 8562.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "HND",
+   "country": "Honduras",
+   "region": "Latin America & Caribbean ",
+   "income": "Lower middle income",
+   "pop_m": 11.0,
+   "access": 95.5,
+   "urban": 99.3,
+   "rural": 90.1,
+   "unserved_m": 0.5,
+   "kwh_pc": 816.0,
+   "losses": 31.5,
+   "gdp_pc": 3598.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "BOL",
+   "country": "Bolivia",
+   "region": "Latin America & Caribbean ",
+   "income": "Lower middle income",
+   "pop_m": 12.6,
+   "access": 96.6,
+   "urban": 99.8,
+   "rural": 88.7,
+   "unserved_m": 0.43,
+   "kwh_pc": 911.0,
+   "losses": 8.9,
+   "gdp_pc": 5148.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "BRA",
+   "country": "Brazil",
+   "region": "Latin America & Caribbean ",
+   "income": "Upper middle income",
+   "pop_m": 212.8,
+   "access": 99.8,
+   "urban": 99.9,
+   "rural": 99.2,
+   "unserved_m": 0.43,
+   "kwh_pc": 3138.0,
+   "losses": 14.9,
+   "gdp_pc": 10713.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "IDN",
+   "country": "Indonesia",
+   "region": "East Asia & Pacific",
+   "income": "Upper middle income",
+   "pop_m": 285.7,
+   "access": 99.9,
+   "urban": 100.0,
+   "rural": 99.7,
+   "unserved_m": 0.29,
+   "kwh_pc": 1611.0,
+   "losses": 6.1,
+   "gdp_pc": 5060.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "LAO",
+   "country": "Lao PDR",
+   "region": "East Asia & Pacific",
+   "income": "Lower middle income",
+   "pop_m": 7.9,
+   "access": 96.5,
+   "urban": 100.0,
+   "rural": 94.2,
+   "unserved_m": 0.28,
+   "kwh_pc": 1502.0,
+   "losses": 5.5,
+   "gdp_pc": 2325.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "ECU",
+   "country": "Ecuador",
+   "region": "Latin America & Caribbean ",
+   "income": "Upper middle income",
+   "pop_m": 18.3,
+   "access": 98.5,
+   "urban": 100.0,
+   "rural": 95.9,
+   "unserved_m": 0.27,
+   "kwh_pc": 1639.0,
+   "losses": 17.1,
+   "gdp_pc": 7125.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "MEX",
+   "country": "Mexico",
+   "region": "Latin America & Caribbean ",
+   "income": "Upper middle income",
+   "pop_m": 131.9,
+   "access": 99.8,
+   "urban": 99.9,
+   "rural": 99.2,
+   "unserved_m": 0.26,
+   "kwh_pc": 2595.0,
+   "losses": 11.3,
+   "gdp_pc": 13889.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "CHL",
+   "country": "Chile",
+   "region": "Latin America & Caribbean ",
+   "income": "High income",
+   "pop_m": 19.9,
+   "access": 99.0,
+   "urban": 100.0,
+   "rural": 90.7,
+   "unserved_m": 0.2,
+   "kwh_pc": 4348.0,
+   "losses": 6.2,
+   "gdp_pc": 17995.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "KHM",
+   "country": "Cambodia",
+   "region": "East Asia & Pacific",
+   "income": "Lower middle income",
+   "pop_m": 17.8,
+   "access": 99.2,
+   "urban": 100.0,
+   "rural": 98.6,
+   "unserved_m": 0.14,
+   "kwh_pc": 1086.0,
+   "losses": 10.2,
+   "gdp_pc": 2872.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "SLV",
+   "country": "El Salvador",
+   "region": "Latin America & Caribbean ",
+   "income": "Upper middle income",
+   "pop_m": 6.4,
+   "access": 98.7,
+   "urban": 99.4,
+   "rural": 96.6,
+   "unserved_m": 0.08,
+   "kwh_pc": 1208.0,
+   "losses": 9.3,
+   "gdp_pc": 5767.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "DOM",
+   "country": "Dominican Republic",
+   "region": "Latin America & Caribbean ",
+   "income": "Upper middle income",
+   "pop_m": 11.5,
+   "access": 99.5,
+   "urban": 99.8,
+   "rural": 98.7,
+   "unserved_m": 0.06,
+   "kwh_pc": 2034.0,
+   "losses": 7.9,
+   "gdp_pc": 11059.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "PRY",
+   "country": "Paraguay",
+   "region": "Latin America & Caribbean ",
+   "income": "Upper middle income",
+   "pop_m": 7.0,
+   "access": 99.8,
+   "urban": 99.9,
+   "rural": 99.6,
+   "unserved_m": 0.01,
+   "kwh_pc": 2849.0,
+   "losses": 16.3,
+   "gdp_pc": 7027.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "TJK",
+   "country": "Tajikistan",
+   "region": "Europe & Central Asia",
+   "income": "Lower middle income",
+   "pop_m": 10.8,
+   "access": 99.9,
+   "urban": 99.9,
+   "rural": 99.9,
+   "unserved_m": 0.01,
+   "kwh_pc": 1559.0,
+   "losses": 16.2,
+   "gdp_pc": 1637.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "CRI",
+   "country": "Costa Rica",
+   "region": "Latin America & Caribbean ",
+   "income": "High income",
+   "pop_m": 5.2,
+   "access": 99.8,
+   "urban": 99.9,
+   "rural": 99.4,
+   "unserved_m": 0.01,
+   "kwh_pc": 2382.0,
+   "losses": 9.5,
+   "gdp_pc": 19970.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "THA",
+   "country": "Thailand",
+   "region": "East Asia & Pacific",
+   "income": "Upper middle income",
+   "pop_m": 71.6,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 3080.0,
+   "losses": 7.0,
+   "gdp_pc": 8057.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "HKG",
+   "country": "Hong Kong SAR, China",
+   "region": "East Asia & Pacific",
+   "income": "High income",
+   "pop_m": 7.5,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 6311.0,
+   "losses": 4.2,
+   "gdp_pc": 56983.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "HUN",
+   "country": "Hungary",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 9.5,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 4825.0,
+   "losses": 7.1,
+   "gdp_pc": 25907.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "ARE",
+   "country": "United Arab Emirates",
+   "region": "Middle East, North Africa, Afghanistan & Pakistan",
+   "income": "High income",
+   "pop_m": 11.5,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 15361.0,
+   "losses": 5.6,
+   "gdp_pc": 50274.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "PRT",
+   "country": "Portugal",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 10.8,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 5460.0,
+   "losses": 9.3,
+   "gdp_pc": 32082.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "DEU",
+   "country": "Germany",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 83.5,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 6060.0,
+   "losses": 5.3,
+   "gdp_pc": 60496.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "JOR",
+   "country": "Jordan",
+   "region": "Middle East, North Africa, Afghanistan & Pakistan",
+   "income": "Upper middle income",
+   "pop_m": 11.5,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 1962.0,
+   "losses": 11.0,
+   "gdp_pc": 5348.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "IRL",
+   "country": "Ireland",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 5.5,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 6497.0,
+   "losses": 7.2,
+   "gdp_pc": 131592.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "AZE",
+   "country": "Azerbaijan",
+   "region": "Europe & Central Asia",
+   "income": "Upper middle income",
+   "pop_m": 10.2,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 2444.0,
+   "losses": 7.9,
+   "gdp_pc": 7411.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "CHE",
+   "country": "Switzerland",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 9.1,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 7111.0,
+   "losses": 6.3,
+   "gdp_pc": 114769.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "UZB",
+   "country": "Uzbekistan",
+   "region": "Europe & Central Asia",
+   "income": "Lower middle income",
+   "pop_m": 37.1,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 2097.0,
+   "losses": 2.7,
+   "gdp_pc": 3968.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "SGP",
+   "country": "Singapore",
+   "region": "East Asia & Pacific",
+   "income": "High income",
+   "pop_m": 6.1,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 9947.0,
+   "losses": 0.2,
+   "gdp_pc": 98814.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "GBR",
+   "country": "United Kingdom",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 69.5,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 4208.0,
+   "losses": 9.6,
+   "gdp_pc": 57602.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "ESP",
+   "country": "Spain",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 49.4,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 5337.0,
+   "losses": 7.8,
+   "gdp_pc": 38627.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "NOR",
+   "country": "Norway",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 5.6,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 23699.0,
+   "losses": 4.6,
+   "gdp_pc": 94594.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "SAU",
+   "country": "Saudi Arabia",
+   "region": "Middle East, North Africa, Afghanistan & Pakistan",
+   "income": "High income",
+   "pop_m": 37.0,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 11808.0,
+   "losses": 9.1,
+   "gdp_pc": 34537.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "AUS",
+   "country": "Australia",
+   "region": "East Asia & Pacific",
+   "income": "High income",
+   "pop_m": 27.6,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 9795.0,
+   "losses": 4.2,
+   "gdp_pc": 65130.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "ITA",
+   "country": "Italy",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 58.9,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 5178.0,
+   "losses": 6.9,
+   "gdp_pc": 43309.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "MAR",
+   "country": "Morocco",
+   "region": "Middle East, North Africa, Afghanistan & Pakistan",
+   "income": "Lower middle income",
+   "pop_m": 38.4,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 1035.0,
+   "losses": 18.1,
+   "gdp_pc": 4672.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "IRN",
+   "country": "Iran, Islamic Rep.",
+   "region": "Middle East, North Africa, Afghanistan & Pakistan",
+   "income": "Upper middle income",
+   "pop_m": 92.4,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 3910.0,
+   "losses": 10.1,
+   "gdp_pc": 3924.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "CAN",
+   "country": "Canada",
+   "region": "North America",
+   "income": "High income",
+   "pop_m": 41.7,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 14655.0,
+   "losses": 4.4,
+   "gdp_pc": 55698.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "NLD",
+   "country": "Netherlands",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 18.1,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 6447.0,
+   "losses": 3.5,
+   "gdp_pc": 73684.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "LKA",
+   "country": "Sri Lanka",
+   "region": "South Asia",
+   "income": "Upper middle income",
+   "pop_m": 21.8,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 695.0,
+   "losses": 9.4,
+   "gdp_pc": 5002.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "DNK",
+   "country": "Denmark",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 6.0,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 6373.0,
+   "losses": 7.2,
+   "gdp_pc": 76970.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "FIN",
+   "country": "Finland",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 5.6,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 15057.0,
+   "losses": 3.8,
+   "gdp_pc": 56149.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "CZE",
+   "country": "Czechia",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 10.9,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 6042.0,
+   "losses": 4.1,
+   "gdp_pc": 35917.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "IRQ",
+   "country": "Iraq",
+   "region": "Middle East, North Africa, Afghanistan & Pakistan",
+   "income": "Upper middle income",
+   "pop_m": 47.0,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 1756.0,
+   "losses": 58.7,
+   "gdp_pc": 5410.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "SRB",
+   "country": "Serbia",
+   "region": "Europe & Central Asia",
+   "income": "Upper middle income",
+   "pop_m": 6.5,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 5166.0,
+   "losses": 10.6,
+   "gdp_pc": 15262.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "ROU",
+   "country": "Romania",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 19.0,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 2682.0,
+   "losses": 9.8,
+   "gdp_pc": 22538.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "SWE",
+   "country": "Sweden",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 10.6,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 11974.0,
+   "losses": 5.8,
+   "gdp_pc": 63133.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "EGY",
+   "country": "Egypt, Arab Rep.",
+   "region": "Middle East, North Africa, Afghanistan & Pakistan",
+   "income": "Lower middle income",
+   "pop_m": 118.4,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 1555.0,
+   "losses": 19.9,
+   "gdp_pc": 3086.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "VEN",
+   "country": "Venezuela, RB",
+   "region": "Latin America & Caribbean ",
+   "income": "Lower middle income",
+   "pop_m": 28.5,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 2362.0,
+   "losses": 18.3,
+   "gdp_pc": 3495.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "TKM",
+   "country": "Turkmenistan",
+   "region": "Europe & Central Asia",
+   "income": "Upper middle income",
+   "pop_m": 7.6,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 3397.0,
+   "losses": 10.7,
+   "gdp_pc": 6540.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "OMN",
+   "country": "Oman",
+   "region": "Middle East, North Africa, Afghanistan & Pakistan",
+   "income": "High income",
+   "pop_m": 5.5,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 8489.0,
+   "losses": 11.9,
+   "gdp_pc": 19947.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "KAZ",
+   "country": "Kazakhstan",
+   "region": "Europe & Central Asia",
+   "income": "Upper middle income",
+   "pop_m": 20.8,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 5667.0,
+   "losses": 8.3,
+   "gdp_pc": 14692.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "NZL",
+   "country": "New Zealand",
+   "region": "East Asia & Pacific",
+   "income": "High income",
+   "pop_m": 5.3,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 7910.0,
+   "losses": 6.8,
+   "gdp_pc": 49591.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "BEL",
+   "country": "Belgium",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 11.9,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 6963.0,
+   "losses": 4.5,
+   "gdp_pc": 60750.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "CUB",
+   "country": "Cuba",
+   "region": "Latin America & Caribbean ",
+   "income": "Upper middle income",
+   "pop_m": 10.9,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 1373.0,
+   "losses": 16.2,
+   "gdp_pc": 9605.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "LBN",
+   "country": "Lebanon",
+   "region": "Middle East, North Africa, Afghanistan & Pakistan",
+   "income": "Lower middle income",
+   "pop_m": 5.8,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 848.0,
+   "losses": 11.4,
+   "gdp_pc": 4473.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "POL",
+   "country": "Poland",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 36.4,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 4565.0,
+   "losses": 5.2,
+   "gdp_pc": 28420.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "ISR",
+   "country": "Israel",
+   "region": "Middle East, North Africa, Afghanistan & Pakistan",
+   "income": "High income",
+   "pop_m": 10.1,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 7203.0,
+   "losses": 5.6,
+   "gdp_pc": 60337.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "RUS",
+   "country": "Russian Federation",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 143.5,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 7774.0,
+   "losses": 8.0,
+   "gdp_pc": 17547.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "BLR",
+   "country": "Belarus",
+   "region": "Europe & Central Asia",
+   "income": "Upper middle income",
+   "pop_m": 9.1,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 4415.0,
+   "losses": 6.6,
+   "gdp_pc": 10279.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "CHN",
+   "country": "China",
+   "region": "East Asia & Pacific",
+   "income": "Upper middle income",
+   "pop_m": 1406.6,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 7038.0,
+   "losses": 3.1,
+   "gdp_pc": 13862.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "TUR",
+   "country": "Turkiye",
+   "region": "Europe & Central Asia",
+   "income": "Upper middle income",
+   "pop_m": 85.9,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 3873.0,
+   "losses": 7.8,
+   "gdp_pc": 18599.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "FRA",
+   "country": "France",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 68.7,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 6536.0,
+   "losses": 6.4,
+   "gdp_pc": 48986.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "KGZ",
+   "country": "Kyrgyz Republic",
+   "region": "Europe & Central Asia",
+   "income": "Lower middle income",
+   "pop_m": 7.3,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 2168.0,
+   "losses": 18.8,
+   "gdp_pc": 3081.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "USA",
+   "country": "United States",
+   "region": "North America",
+   "income": "High income",
+   "pop_m": 341.8,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 13064.0,
+   "losses": 5.3,
+   "gdp_pc": 90027.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "GRC",
+   "country": "Greece",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 10.4,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 4782.0,
+   "losses": 9.9,
+   "gdp_pc": 26948.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "UKR",
+   "country": "Ukraine",
+   "region": "Europe & Central Asia",
+   "income": "Upper middle income",
+   "pop_m": 39.0,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 2599.0,
+   "losses": 10.1,
+   "gdp_pc": 5866.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "TUN",
+   "country": "Tunisia",
+   "region": "Middle East, North Africa, Afghanistan & Pakistan",
+   "income": "Lower middle income",
+   "pop_m": 12.3,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 1570.0,
+   "losses": 21.0,
+   "gdp_pc": 4657.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "SVK",
+   "country": "Slovak Republic",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 5.4,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 4713.0,
+   "losses": 5.1,
+   "gdp_pc": 28544.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "KOR",
+   "country": "Korea, Rep.",
+   "region": "East Asia & Pacific",
+   "income": "High income",
+   "pop_m": 51.7,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 12071.0,
+   "losses": 3.0,
+   "gdp_pc": 36227.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "AUT",
+   "country": "Austria",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 9.2,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 8050.0,
+   "losses": 4.3,
+   "gdp_pc": 62930.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "VNM",
+   "country": "Viet Nam",
+   "region": "East Asia & Pacific",
+   "income": "Upper middle income",
+   "pop_m": 101.6,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 2756.0,
+   "losses": 6.7,
+   "gdp_pc": 5066.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "DZA",
+   "country": "Algeria",
+   "region": "Middle East, North Africa, Afghanistan & Pakistan",
+   "income": "Upper middle income",
+   "pop_m": 47.4,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 1918.0,
+   "losses": 8.9,
+   "gdp_pc": 6051.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "MYS",
+   "country": "Malaysia",
+   "region": "East Asia & Pacific",
+   "income": "Upper middle income",
+   "pop_m": 36.0,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 5418.0,
+   "losses": 6.9,
+   "gdp_pc": 13125.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  },
+  {
+   "iso": "JPN",
+   "country": "Japan",
+   "region": "East Asia & Pacific",
+   "income": "High income",
+   "pop_m": 123.4,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 7531.0,
+   "losses": 4.6,
+   "gdp_pc": 35951.0,
+   "year_access": 2024,
+   "year_losses": 2025,
+   "year_kwh": 2025
+  },
+  {
+   "iso": "BGR",
+   "country": "Bulgaria",
+   "region": "Europe & Central Asia",
+   "income": "High income",
+   "pop_m": 6.4,
+   "access": 100.0,
+   "urban": 100.0,
+   "rural": 100.0,
+   "unserved_m": 0.0,
+   "kwh_pc": 5470.0,
+   "losses": 6.0,
+   "gdp_pc": 20328.0,
+   "year_access": 2024,
+   "year_losses": 2024,
+   "year_kwh": 2024
+  }
+ ]
+};
+</script>
+<script>
+const PASS = "distribution";
+const GRID_SVC = "https://services.arcgis.com/iQ1dY19aHwbSDYIF/arcgis/rest/services/grid_data/FeatureServer/0/query";
+const STYLE_URL = "https://tiles.openfreemap.org/styles/dark";
+let DATA=null, ROWS=[], BY_ISO={}, TAB="access", SORT={key:"unserved_m",dir:-1};
+let MAP=null, MODE="2d", SHOW_GRID=true, GEO=null, GRIDCACHE=new Map(), GRIDTIMER=null;
+
+const COLS = {
+  access: [
+    {k:"country",l:"Country",type:"s"},{k:"region",l:"Region",type:"s"},
+    {k:"pop_m",l:"Population m",type:"n",d:1},{k:"access",l:"Access %",type:"n",d:1},
+    {k:"urban",l:"Urban %",type:"n",d:1},{k:"rural",l:"Rural %",type:"n",d:1},
+    {k:"unserved_m",l:"Unserved m",type:"n",d:2},
+  ],
+  perf: [
+    {k:"country",l:"Country",type:"s"},{k:"region",l:"Region",type:"s"},
+    {k:"kwh_pc",l:"kWh per capita",type:"n",d:0},{k:"losses",l:"T&D losses %",type:"n",d:1},
+    {k:"gdp_pc",l:"GDP per capita USD",type:"n",d:0},{k:"income",l:"Income group",type:"s"},
+  ],
+  cover: [
+    {k:"country",l:"Country",type:"s"},{k:"iso",l:"ISO",type:"s"},
+    {k:"year_access",l:"Access year",type:"n",d:0},{k:"year_losses",l:"Loss year",type:"n",d:0},
+    {k:"year_kwh",l:"Consumption year",type:"n",d:0},
+  ],
+};
+
+function fmt(v,c){
+  if(v===null||v===undefined||v==="") return "<span class='pill'>n/a</span>";
+  if(c.type==="n") return Number(v).toLocaleString("en-GB",{minimumFractionDigits:c.d||0,maximumFractionDigits:c.d||0});
+  return v;
+}
+function median(a){const b=a.filter(x=>x!==null&&x!==undefined).sort((x,y)=>x-y);
+  return b.length?b[Math.floor(b.length/2)]:0;}
+
+function start(){
+  DATA=window.TRACKER_DATA;
+  ROWS=DATA.rows.map(r=>Object.assign({},r,{region:(r.region||"").trim()}));
+  ROWS.forEach(r=>BY_ISO[r.iso]=r);
+  document.getElementById("sub").textContent=DATA.meta.subtitle+" · as of "+DATA.meta.as_of;
+  buildKpis(); buildFilters(); render(); initMap();
+}
+
+function buildKpis(){
+  const unserved=ROWS.reduce((a,r)=>a+r.unserved_m,0);
+  const under90=ROWS.filter(r=>r.access<90).length;
+  const lossMed=median(ROWS.map(r=>r.losses));
+  const lossHigh=ROWS.filter(r=>r.losses>=15).length;
+  document.getElementById("kpis").innerHTML=[
+    [ROWS.length,"Countries"],[unserved.toFixed(0)+"m","Unserved people"],
+    [under90,"Below 90% access"],[lossMed.toFixed(1)+"%","Median T&D losses"],
+    [lossHigh,"Losses at 15%+"],
+  ].map(([n,l])=>`<div class="kpi"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
+}
+
+function buildFilters(){
+  const rs=[...new Set(ROWS.map(r=>r.region.trim()))].sort();
+  const is=[...new Set(ROWS.map(r=>r.income))].sort();
+  document.getElementById("region").innerHTML+=rs.map(r=>`<option>${r}</option>`).join("");
+  document.getElementById("income").innerHTML+=is.map(i=>`<option>${i}</option>`).join("");
+}
+
+function filtered(){
+  const q=document.getElementById("q").value.toLowerCase().trim();
+  const rg=document.getElementById("region").value;
+  const ic=document.getElementById("income").value;
+  return ROWS.filter(r=>{
+    if(rg&&r.region.trim()!==rg) return false;
+    if(ic&&r.income!==ic) return false;
+    if(q&&!(r.country.toLowerCase().includes(q)||r.region.toLowerCase().includes(q))) return false;
+    return true;
+  });
+}
+
+function render(){
+  const cols=COLS[TAB], th=document.getElementById("thead");
+  th.innerHTML="<tr>"+cols.map(c=>{
+    const on=SORT.key===c.k, ar=on?(SORT.dir>0?"▲":"▼"):"◆";
+    return `<th data-k="${c.k}" class="${on?'sorted':''}">${c.l}<span class="ar">${ar}</span></th>`;
+  }).join("")+"</tr>";
+  th.querySelectorAll("th").forEach(el=>el.onclick=()=>{
+    const k=el.dataset.k;
+    if(SORT.key===k) SORT.dir*=-1;
+    else {SORT.key=k; SORT.dir=(COLS[TAB].find(c=>c.k===k).type==="s")?1:-1;}
+    render();
+  });
+  const rows=filtered().slice().sort((a,b)=>{
+    const av=a[SORT.key], bv=b[SORT.key];
+    if(av===null||av===undefined) return 1;
+    if(bv===null||bv===undefined) return -1;
+    if(typeof av==="string") return av.localeCompare(bv)*SORT.dir;
+    return (av-bv)*SORT.dir;
+  });
+  document.getElementById("tbody").innerHTML=rows.map(r=>{
+    const tds=cols.map((c,i)=>{
+      let v=fmt(r[c.k],c);
+      if(i===0) return `<td class="name">${v}</td>`;
+      if(c.k==="access"&&r.access<50) v=`<span class="bad">${v}</span>`;
+      if(c.k==="losses"&&r.losses>=15) v=`<span class="warn">${v}</span>`;
+      return `<td>${v}</td>`;
+    }).join("");
+    return `<tr data-iso="${r.iso}">${tds}</tr>`;
+  }).join("");
+  document.querySelectorAll("#tbody tr").forEach(tr=>tr.onclick=()=>focusCountry(tr.dataset.iso));
+  document.getElementById("count").textContent=rows.length+" of "+ROWS.length+" countries";
+  document.getElementById("foot").innerHTML=
+    DATA.meta.note+"<br>Map: ESMAP gridfinder predicted distribution and transmission network (World Bank, CC BY 4.0), "+
+    "line geometry read live from the published ArcGIS feature service, world shading rasterised from targets.tif. "+
+    "OpenStreetMap-mapped lines are highlighted where present. The model validates at about 70% accuracy at 1 km.<br>"+
+    "Basemap: OpenFreeMap, OpenStreetMap data, no API key. Renderer: MapLibre GL JS, BSD-3. "+
+    "Tables: World Bank World Development Indicators, indicators <code>EG.ELC.ACCS.ZS</code>, "+
+    "<code>EG.ELC.ACCS.UR.ZS</code>, <code>EG.ELC.ACCS.RU.ZS</code>, <code>EG.ELC.LOSS.ZS</code>, "+
+    "<code>EG.USE.ELEC.KH.PC</code>, <code>SP.POP.TOTL</code>, <code>NY.GDP.PCAP.CD</code>. "+
+    "Countries under 5 million population excluded.";
+}
+
+function downloadCsv(){
+  const cols=COLS[TAB], rows=filtered();
+  const head=cols.map(c=>c.l).join(",");
+  const body=rows.map(r=>cols.map(c=>{
+    const v=r[c.k]; if(v===null||v===undefined) return "";
+    const s=String(v); return s.includes(",")?`"${s}"`:s;
+  }).join(",")).join("\n");
+  const blob=new Blob([head+"\n"+body],{type:"text/csv"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download="distribution_"+TAB+".csv"; a.click();
+}
+
+/* ---------- map ---------- */
+const METRIC={
+  access:{field:"access",ramp:["#6b1f1f","#9c3a32","#c06a34","#c99a3a","#6fae7a","#2f8f6f"],lo:0,hi:100},
+  unserved_m:{field:"unserved_m",ramp:["#1d2a33","#28505c","#357f6e","#63b287","#f0a13a","#e05c5c"],lo:0,hi:60},
+  losses:{field:"losses",ramp:["#1d2a33","#28505c","#357f6e","#c99a3a","#e07b3a","#e05c5c"],lo:0,hi:30},
+};
+function colourExpr(m){
+  const c=METRIC[m], stops=[];
+  for(let i=0;i<c.ramp.length;i++) stops.push(c.lo+(c.hi-c.lo)*(i/(c.ramp.length-1)),c.ramp[i]);
+  return ["interpolate",["linear"],["coalesce",["get",c.field],0],...stops];
+}
+function buildGeo(){
+  const feats=[];
+  (GEO.features||[]).forEach(f=>{
+    const r=BY_ISO[f.properties.iso]; if(!r) return;
+    feats.push({type:"Feature",geometry:f.geometry,
+      properties:{iso:r.iso,access:r.access,unserved_m:r.unserved_m,losses:r.losses}});
+  });
+  return {type:"FeatureCollection",features:feats};
+}
+
+function initMap(){
+  fetch("data/countries.geo.json").then(r=>r.json()).then(geo=>{
+    GEO=geo;
+    MAP=new maplibregl.Map({
+      container:"map", style:STYLE_URL,
+      center:[18,12], zoom:2.1, pitch:0, bearing:0,
+      attributionControl:{compact:true}
+    });
+    MAP.on("load",()=>{
+      MAP.addSource("countries",{type:"geojson",data:buildGeo()});
+      MAP.addLayer({id:"c-fill",type:"fill",source:"countries",
+        paint:{"fill-color":colourExpr("access"),"fill-opacity":0.7}});
+      MAP.addLayer({id:"c-line",type:"line",source:"countries",
+        paint:{"line-color":"#0b0e13","line-width":0.7,"line-opacity":0.65}});
+      MAP.addLayer({id:"c-extrude",type:"fill-extrusion",source:"countries",layout:{"visibility":"none"},
+        paint:{"fill-extrusion-color":colourExpr("access"),
+               "fill-extrusion-height":["*",["coalesce",["get","unserved_m"],0],12000],
+               "fill-extrusion-opacity":0.86}});
+      MAP.addSource("gridpresence",{type:"image",url:"data/grid_presence.png",
+        coordinates:[[-178.277,75.002],[178.619,75.002],[178.619,-55.973],[-178.277,-55.973]]});
+      MAP.addLayer({id:"gp",type:"raster",source:"gridpresence",
+        paint:{"raster-opacity":0.5,"raster-fade-duration":0}});
+      MAP.addSource("gridlines",{type:"geojson",data:{type:"FeatureCollection",features:[]}});
+      MAP.addLayer({id:"gl",type:"line",source:"gridlines",minzoom:3,
+        paint:{"line-color":["case",["==",["get","source"],"osm"],"#f0a13a","#4cc2a0"],
+               "line-width":["interpolate",["linear"],["zoom"],3,0.4,8,1.1,14,1.9],
+               "line-opacity":0.8}});
+
+      MAP.on("moveend",()=>{refreshGrid();updateNote();});
+      MAP.on("click","c-fill",e=>{if(e.features&&e.features[0])focusCountry(e.features[0].properties.iso,false);});
+      MAP.on("mouseenter","c-fill",()=>MAP.getCanvas().style.cursor="pointer");
+      MAP.on("mouseleave","c-fill",()=>MAP.getCanvas().style.cursor="");
+
+      document.querySelectorAll("#mode button").forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+      document.getElementById("metric").onchange=()=>{
+        const m=document.getElementById("metric").value;
+        MAP.setPaintProperty("c-fill","fill-color",colourExpr(m));
+        MAP.setPaintProperty("c-extrude","fill-extrusion-color",colourExpr(m));
+      };
+      document.getElementById("gridtoggle").onclick=e=>{
+        SHOW_GRID=!SHOW_GRID;
+        e.target.textContent="Grid lines: "+(SHOW_GRID?"on":"off");
+        MAP.setLayoutProperty("gl","visibility",SHOW_GRID?"visible":"none");
+        MAP.setLayoutProperty("gp","visibility",SHOW_GRID?"visible":"none");
+      };
+      refreshGrid(); updateNote();
+    });
+  });
+}
+
+function setMode(m){
+  MODE=m;
+  document.querySelectorAll("#mode button").forEach(b=>b.classList.toggle("on",b.dataset.m===m));
+  if(m==="2d"){
+    MAP.setProjection({type:"mercator"});
+    MAP.setLayoutProperty("c-extrude","visibility","none");
+    MAP.easeTo({pitch:0,bearing:0,duration:600});
+  } else if(m==="3d"){
+    MAP.setProjection({type:"mercator"});
+    MAP.setLayoutProperty("c-extrude","visibility","visible");
+    MAP.easeTo({pitch:52,bearing:-18,duration:700});
+  } else {
+    MAP.setProjection({type:"globe"});
+    MAP.setLayoutProperty("c-extrude","visibility","visible");
+    MAP.easeTo({pitch:22,bearing:0,duration:700});
+  }
+}
+
+function updateNote(){
+  const z=MAP.getZoom();
+  document.getElementById("mapnote").textContent = z<3
+    ? "World view: predicted grid presence shown as shading. Zoom past level 3 for line geometry."
+    : "Lines: gridfinder prediction, highlighted where OpenStreetMap has mapped them.";
+}
+
+function refreshGrid(){
+  if(!MAP) return;
+  const z=MAP.getZoom();
+  if(z<3||!SHOW_GRID) return;
+  const b=MAP.getBounds();
+  const key=[b.getWest(),b.getSouth(),b.getEast(),b.getNorth()].map(v=>v.toFixed(2)).join(",");
+  if(GRIDCACHE.has(key)){setGrid(GRIDCACHE.get(key));return;}
+  clearTimeout(GRIDTIMER);
+  GRIDTIMER=setTimeout(()=>{
+    const params=new URLSearchParams({
+      where:"1=1",outFields:"source",returnGeometry:"true",f:"geojson",
+      geometryType:"esriGeometryEnvelope",inSR:"4326",outSR:"4326",
+      spatialRel:"esriSpatialRelIntersects",resultRecordCount:"2000",
+      geometry:[b.getWest(),b.getSouth(),b.getEast(),b.getNorth()].join(",")
+    });
+    fetch(GRID_SVC+"?"+params).then(r=>r.json()).then(gj=>{
+      if(!gj.features) return;
+      GRIDCACHE.set(key,gj); setGrid(gj);
+    }).catch(()=>{});
+  },450);
+}
+function setGrid(gj){ if(MAP.getSource("gridlines")) MAP.getSource("gridlines").setData(gj); }
+
+function focusCountry(iso,fly=true){
+  const r=BY_ISO[iso]; if(!r) return;
+  const p=document.getElementById("panel");
+  p.style.display="block";
+  p.innerHTML=`<h3>${r.country}</h3>
+    <div class="row"><span class="k">Population</span><span>${r.pop_m} m</span></div>
+    <div class="row"><span class="k">Access</span><span>${r.access}%</span></div>
+    <div class="row"><span class="k">Urban / rural</span><span>${r.urban} / ${r.rural}</span></div>
+    <div class="row"><span class="k">Unserved</span><span>${r.unserved_m} m</span></div>
+    <div class="row"><span class="k">T&amp;D losses</span><span>${r.losses}%</span></div>
+    <div class="row"><span class="k">kWh per capita</span><span>${r.kwh_pc}</span></div>`;
+  if(fly&&GEO){
+    const f=GEO.features.find(x=>x.properties.iso===iso);
+    if(f){
+      const b=new maplibregl.LngLatBounds();
+      const walk=c=>{ if(typeof c[0]==="number") b.extend(c); else c.forEach(walk); };
+      walk(f.geometry.coordinates);
+      MAP.fitBounds(b,{padding:70,maxZoom:6,duration:900});
+    }
+  }
+}
+
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
+  t.classList.add("on"); TAB=t.dataset.t;
+  SORT={key:COLS[TAB][0].k,dir:1}; render();
+});
+document.getElementById("q").oninput=render;
+document.getElementById("region").onchange=render;
+document.getElementById("income").onchange=render;
+document.getElementById("csv").onclick=downloadCsv;
+
+start();
+</script>
+</body>
+</html>
