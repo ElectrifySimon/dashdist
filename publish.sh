@@ -30,6 +30,7 @@ npx --yes staticrypt@3.5.4 build/index.html -p distribution -d gated --remember 
 
 mkdir -p gated/data
 cp data/countries.geo.json data/grid_presence.png gated/data/
+cp -r data/tiles gated/data/tiles
 cp -r vendor gated/
 cp README.md gated/README.md 2>/dev/null || true
 echo "--- gated tree ---"

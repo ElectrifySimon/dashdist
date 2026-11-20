@@ -161,8 +161,8 @@ tbody tr{transition:background var(--d-feedback) var(--e-out)}
     <div id="panel"></div>
     <div class="mapnote" id="mapnote"></div>
     <div class="legend">
-      <div><span class="sw" style="background:#4cc2a0"></span>gridfinder predicted</div>
-      <div><span class="sw" style="background:#f0a13a"></span>OpenStreetMap mapped</div>
+      <div><span class="sw" style="background:#22d3ee"></span>predicted network</div>
+      <div><span class="sw" style="background:#5a6b7d"></span>no prediction</div>
     </div>
   </div>
 
@@ -198,14 +198,14 @@ import * as maplibregl from './vendor/maplibre-gl.mjs';
 window.maplibregl = maplibregl;
 
 const PASS = "distribution";
-const GRID_SVC = "https://services.arcgis.com/iQ1dY19aHwbSDYIF/arcgis/rest/services/grid_data/FeatureServer/0/query";
 const STYLE_URL = "https://tiles.openfreemap.org/styles/dark";
 
 let ROWS=[], BY_ISO={}, TAB="access", SORT={key:"unserved_m",dir:-1};
 let MAP=null, OVERLAY=null, MODE="2d", SHOW_GRID=true, GEO=null, GEOJSON=null;
-let GRIDCACHE=new Map(), GRIDTIMER=null, GRIDDATA={type:"FeatureCollection",features:[]};
+let TILECACHE=new Map(), GRIDTIMER=null, LASTSIG="", GRIDDATA={type:"FeatureCollection",features:[]};
 window.MAP=null;
 window.__grid=()=>GRIDDATA.features.length;
+window.__tiles=()=>Array.from(TILECACHE.keys()).length;
 window.__raster=()=>{try{return MAP.getLayoutProperty("gp","visibility")}catch(e){return "none"}};
 
 const COLS = {
@@ -391,11 +391,19 @@ function deckLayers(){
   ];
   if(SHOW_GRID){
     L.push(new deck.GeoJsonLayer({
+      id:"gridhalo",
+      data:GRIDDATA,
+      filled:false, stroked:true,
+      getLineColor:[2,7,10,235],
+      getLineWidth:4.4, lineWidthUnits:"pixels",
+      pickable:false
+    }));
+    L.push(new deck.GeoJsonLayer({
       id:"gridlines",
       data:GRIDDATA,
       filled:false, stroked:true,
-      getLineColor:d=>d.properties.source==="osm"?[240,161,58,225]:[76,194,160,200],
-      getLineWidth:1.1, lineWidthUnits:"pixels",
+      getLineColor:d=>d.properties&&d.properties.source==="osm"?[251,191,36,255]:[34,211,238,255],
+      getLineWidth:1.8, lineWidthUnits:"pixels",
       pickable:false
     }));
   }
@@ -466,7 +474,7 @@ function updateNote(){
   } else if(z<3){
     el.textContent="World view: predicted grid presence as shading. Zoom past level 3 for line geometry.";
   } else {
-    el.textContent="Line geometry from the published feature service. Teal predicted, amber already mapped in OpenStreetMap.";
+    el.textContent="Predicted network, drawn from the local gridfinder extract. No external service is called.";
   }
 }
 
@@ -474,7 +482,30 @@ function applyRasterVisibility(){
   if(!MAP||!MAP.getLayer("gp")) return;
   const show=SHOW_GRID && MAP.getZoom()<3;
   MAP.setLayoutProperty("gp","visibility",show?"visible":"none");
-  MAP.setPaintProperty("gp","raster-opacity",show?0.5:0);
+  MAP.setPaintProperty("gp","raster-opacity",show?0.42:0);
+}
+
+function tileRange(z,b){
+  const n=2**z;
+  const tx0=Math.floor((b.getWest()+180)/360*n), tx1=Math.floor((b.getEast()+180)/360*n);
+  const ty0=Math.floor((1-Math.log(Math.tan(Math.PI/4+Math.max(-85,Math.min(85,b.getNorth()))*Math.PI/360))/Math.PI)/2*n);
+  const ty1=Math.floor((1-Math.log(Math.tan(Math.PI/4+Math.max(-85,Math.min(85,b.getSouth()))*Math.PI/360))/Math.PI)/2*n);
+  const out=[];
+  for(let x=Math.max(0,tx0);x<=Math.min(n-1,tx1);x++)
+    for(let y=Math.max(0,ty0);y<=Math.min(n-1,ty1);y++) out.push([z,x,y]);
+  return out;
+}
+
+function loadTiles(list){
+  const jobs=list.map(([z,x,y])=>{
+    const key=z+"/"+x+"_"+y;
+    if(TILECACHE.has(key)) return Promise.resolve(TILECACHE.get(key));
+    return fetch("data/tiles/"+key+".json")
+      .then(r=>r.ok?r.json():null)
+      .then(g=>{ if(g) TILECACHE.set(key,g); return g; })
+      .catch(()=>null);
+  });
+  return Promise.all(jobs);
 }
 
 function refreshGrid(){
@@ -485,26 +516,20 @@ function refreshGrid(){
     if(GRIDDATA.features.length){ GRIDDATA={type:"FeatureCollection",features:[]}; refreshDeck(); }
     return;
   }
-  const b=MAP.getBounds();
-  const key=[b.getWest(),b.getSouth(),b.getEast(),b.getNorth()].map(v=>v.toFixed(2)).join(",");
-  if(GRIDCACHE.has(key)){ GRIDDATA=GRIDCACHE.get(key); refreshDeck(); return; }
+  const lvl = z<4.5 ? 4 : 5;
+  const list = tileRange(lvl, MAP.getBounds());
+  const sig = lvl+":"+list.length+":"+list.map(t=>t[1]+"_"+t[2]).join(",");
+  if(sig===LASTSIG) return;
+  LASTSIG=sig;
   clearTimeout(GRIDTIMER);
   GRIDTIMER=setTimeout(()=>{
-    const zz=MAP.getZoom();
-    if(zz<3) return;
-    const bb=MAP.getBounds();
-    const params=new URLSearchParams({
-      where:"1=1",outFields:"source",returnGeometry:"true",f:"geojson",
-      geometryType:"esriGeometryEnvelope",inSR:"4326",outSR:"4326",
-      spatialRel:"esriSpatialRelIntersects",resultRecordCount:"2000",
-      geometry:[bb.getWest(),bb.getSouth(),bb.getEast(),bb.getNorth()].join(",")
+    loadTiles(list).then(gs=>{
+      const features=gs.filter(Boolean).map(g=>({type:"Feature",properties:{},geometry:g}));
+      GRIDDATA={type:"FeatureCollection",features};
+      refreshDeck(); updateNote();
+      document.getElementById("mapnote").dataset.tiles=String(features.length);
     });
-    fetch(GRID_SVC+"?"+params).then(r=>r.json()).then(gj=>{
-      if(!gj||!gj.features) return;
-      const k=[bb.getWest(),bb.getSouth(),bb.getEast(),bb.getNorth()].map(v=>v.toFixed(2)).join(",");
-      GRIDCACHE.set(k,gj); GRIDDATA=gj; refreshDeck(); updateNote();
-    }).catch(()=>{});
-  },400);
+  },250);
 }
 
 function focusCountry(iso,fly=true){

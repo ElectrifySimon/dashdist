@@ -30,9 +30,8 @@ source URLs below.
   latest non-null observation per country. Licence CC BY 4.0.
 - Natural Earth 110m admin 0 countries, via `nvkelso/natural-earth-vector`.
   Public domain. `ISO_A3` with `ADM0_A3` fallback.
-- Live line geometry: World Bank ArcGIS feature service
-  `https://services.arcgis.com/iQ1dY19aHwbSDYIF/arcgis/rest/services/grid_data/FeatureServer/0`
-  queried by envelope above zoom 3, 2000 features per request.
+- Line geometry is served from `data/tiles/`, generated locally by `make_tiles.py`
+  from `data/raw/grid.gpkg`. Nothing is fetched from a third party at runtime.
 - Basemap: OpenFreeMap `dark` style, OpenStreetMap data, ODbL. No API key.
 
 ## Derived network metrics
@@ -57,3 +56,13 @@ a substitute for a regulator's own asset register.
 python3 build.py                                    # merge into data.js
 bash publish.sh                                      # encrypt and stage gated/
 ```
+
+## Line tiles
+
+`make_tiles.py` cuts the 3.7M-segment network into static GeoJSON tiles:
+
+- `data/tiles/4/` 84 files, 1.9 MB, simplify 0.08 degrees, parts under 0.15 degrees dropped
+- `data/tiles/5/` 247 files, 18.5 MB, simplify 0.02 degrees, parts under 0.05 degrees dropped
+
+Below zoom 3 the page shows the presence raster only. Zoom 3 to 4.5 loads level 4
+tiles, above that level 5. Tiles are cached in the browser per session.
