@@ -747,6 +747,7 @@ function buildGeo(){
 }
 function deckLayers(){
   const m=METRIC, extrusion=MODE!=="2d";
+  const showLines = SHOW_GRID && MAP && MAP.getZoom()>=3.0;
   const L=[new deck.GeoJsonLayer({
     id:"countries", data:GEOJSON,
     filled:true, stroked:true, extruded:extrusion, wireframe:false,
@@ -759,7 +760,7 @@ function deckLayers(){
     onClick:info=>{if(info.object) focusCountry(info.object.properties.iso,false);},
     updateTriggers:{getFillColor:[m,isDark()],getElevation:[extrusion],getLineColor:[isDark()]}
   })];
-  if(SHOW_GRID){
+  if(showLines){
     L.push(new deck.GeoJsonLayer({id:"gridhalo",data:GRIDDATA,filled:false,stroked:true,
       getLineColor:isDark()?[2,7,10,235]:[255,255,255,235],getLineWidth:4.4,lineWidthUnits:"pixels",pickable:false}));
     L.push(new deck.GeoJsonLayer({id:"gridlines",data:GRIDDATA,filled:false,stroked:true,
