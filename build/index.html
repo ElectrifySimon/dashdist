@@ -195,9 +195,12 @@ tbody tr{transition:background var(--d-feedback) var(--e-out)}
     <div class="tab" data-t="net">Network</div>
     <div class="tab" data-t="cover">Data coverage</div>
     <div class="tab" data-t="charts">Charts</div>
+    <div class="tab" data-t="gpu">Charts GPU</div>
   </div>
 
   <div id="charts" class="charts" hidden></div>
+
+  <div id="gpu" class="charts" hidden></div>
 
   <div class="tblwrap" id="tblwrap">
     <table>
@@ -2573,10 +2576,12 @@ function filtered(){
 }
 
 function render(){
-  const isCharts = TAB==="charts";
+  const isCharts = TAB==="charts", isGpu = TAB==="gpu";
   document.getElementById("charts").hidden = !isCharts;
-  document.getElementById("tblwrap").hidden = isCharts;
+  document.getElementById("gpu").hidden = !isGpu;
+  document.getElementById("tblwrap").hidden = isCharts || isGpu;
   if(isCharts){ drawCharts(); document.getElementById("count").textContent=ROWS.length+" countries"; return; }
+  if(isGpu){ drawChartsGPU(); document.getElementById("count").textContent=ROWS.length+" countries"; return; }
   const cols=COLS[TAB], th=document.getElementById("thead");
   th.innerHTML="<tr>"+cols.map(c=>{
     const on=SORT.key===c.k, ar=on?(SORT.dir>0?"▲":"▼"):"◆";
@@ -2726,6 +2731,83 @@ function cTree(rows){
       data:top.map(r=>({name:r.country,value:Math.max(.4,r.unserved_m)}))}]
   });
 }
+
+/* ---------- charts: ChartGPU 0.4 (WebGPU), comparison tab ---------- */
+let GPUCHARTS=[], GPULIB=null;
+async function drawChartsGPU(){
+  const el=document.getElementById("gpu");
+  const rows=filtered();
+  if(!el.dataset.built){
+    el.dataset.built="1";
+    const titles=[["Unserved by region","Millions without access"],
+                  ["Density leaders","km per 1,000 km2"],
+                  ["Access against density","Each point is a country"],
+                  ["Losses leaders","Percent of energy lost"]];
+    el.innerHTML=`<div class="card" style="grid-column:1/-1"><h3>ChartGPU 0.4</h3>
+        <p id="gpustat">Checking WebGPU</p></div>`+
+      titles.map((t,i)=>`<div class="card"><h3>${t[0]}</h3><p>${t[1]}</p>
+        <div class="plot" id="g${i+1}"></div></div>`).join("");
+  }
+  const stat=document.getElementById("gpustat");
+  let adapter=null;
+  try{ adapter = navigator.gpu ? await navigator.gpu.requestAdapter() : null; }catch(e){ adapter=null; }
+  if(!adapter){
+    stat.textContent=(navigator.gpu?"WebGPU is present but no GPU adapter is available (headless server, VM or driver block). ":"This browser has no WebGPU. ")
+      +"Open in Chrome or Edge 113+ on a machine with a GPU, or Safari 18+. The Charts tab shows the same four figures on ECharts.";
+    return;
+  }
+  try{
+    if(!GPULIB) GPULIB=await import("./vendor/chartgpu/index.js");
+  }catch(e){ stat.textContent="ChartGPU failed to load: "+String(e).slice(0,90); return; }
+  stat.textContent="WebGPU device acquired. Same data as the Charts tab.";
+  GPUCHARTS.forEach(c=>{try{c.dispose()}catch(e){}}); GPUCHARTS=[];
+
+  const mk=async(id,opts)=>{
+    const box=document.getElementById(id); if(!box) return;
+    box.innerHTML="";
+    try{ GPUCHARTS.push(await GPULIB.ChartGPU.create(box,Object.assign({theme:"dark",animation:true},opts))); }
+    catch(e){ box.textContent="render failed: "+String(e).slice(0,60); }
+  };
+  const fmtIdx=labels=>v=>labels[Math.round(v)]||"";
+
+  // 1 region totals
+  const agg={};
+  rows.forEach(r=>{const k=(r.region||"Other").trim();agg[k]=(agg[k]||0)+r.unserved_m;});
+  const reg=Object.entries(agg).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  await mk("g1",{
+    xAxis:{type:"value",tickFormatter:fmtIdx(reg.map(d=>d[0]))},
+    yAxis:{},
+    series:[{type:"bar",name:"Unserved",data:{x:reg.map((d,i)=>i),y:reg.map(d=>Math.round(d[1]))},
+             color:"#22d3ee",barWidth:0.6}]
+  });
+
+  // 2 density
+  const dens=rows.filter(r=>r.km_per_1000km2!=null).sort((a,b)=>b.km_per_1000km2-a.km_per_1000km2).slice(0,10);
+  await mk("g2",{
+    xAxis:{type:"value",tickFormatter:fmtIdx(dens.map(r=>r.country))},
+    yAxis:{},
+    series:[{type:"bar",name:"Density",data:{x:dens.map((d,i)=>i),y:dens.map(r=>Math.round(r.km_per_1000km2))},
+             color:"#a3e635",barWidth:0.6}]
+  });
+
+  // 3 scatter
+  const sc=rows.filter(r=>r.access!=null&&r.km_per_1000km2!=null);
+  await mk("g3",{
+    xAxis:{type:"value"}, yAxis:{},
+    series:[{type:"scatter",name:"Countries",data:{x:sc.map(r=>r.access),y:sc.map(r=>r.km_per_1000km2)},
+             color:"#fbbf24",symbolSize:4}]
+  });
+
+  // 4 losses
+  const los=rows.filter(r=>r.losses!=null).sort((a,b)=>b.losses-a.losses).slice(0,10);
+  await mk("g4",{
+    xAxis:{type:"value",tickFormatter:fmtIdx(los.map(r=>r.country))},
+    yAxis:{},
+    series:[{type:"bar",name:"Losses",data:{x:los.map((d,i)=>i),y:los.map(r=>r.losses)},
+             color:"#f97316",barWidth:0.6}]
+  });
+}
+
 /* ---------- map ---------- */
 const RAMP={
   access:["#6b1f1f","#9c3a32","#c06a34","#c99a3a","#6fae7a","#2f8f6f"],
