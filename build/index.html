@@ -80,6 +80,38 @@ td.name{font-weight:500}
 #err{color:var(--bad);font-size:12px;min-height:16px;margin-top:8px}
 @media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}#map{height:420px}}
 @media(max-width:620px){.kpis{grid-template-columns:repeat(2,1fr)}.wrap{padding:16px 10px 40px}}
+/* ---- motion system: 20 UX principles, kenisbuilding.com/resources ---- */
+:root{
+  --e-out:cubic-bezier(.16,1,.3,1);
+  --e-in:cubic-bezier(.7,0,.84,0);
+  --e-io:cubic-bezier(.65,0,.35,1);
+  --d-feedback:120ms; --d-ui:220ms; --d-panel:320ms;
+}
+.kpi{transition:transform var(--d-ui) var(--e-out),border-color var(--d-ui) var(--e-out);
+  animation:kpi-in 420ms var(--e-out) both}
+.kpi:hover{transform:translateY(-3px);border-color:#3a4756}
+@keyframes kpi-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.tab,.btn,.seg button{transition:background var(--d-feedback) var(--e-out),
+  color var(--d-feedback) var(--e-out),border-color var(--d-feedback) var(--e-out),
+  transform 90ms var(--e-out)}
+.btn:active,.seg button:active,.tab:active{transform:scale(.96)}
+tbody tr{transition:background var(--d-feedback) var(--e-out)}
+#tbody.enter{animation:rows-in 240ms var(--e-out) both}
+#tbody.enter tr:nth-child(-n+8){animation:rows-in 220ms var(--e-out) both}
+#tbody.enter tr:nth-child(1){animation-delay:0ms}#tbody.enter tr:nth-child(2){animation-delay:30ms}
+#tbody.enter tr:nth-child(3){animation-delay:60ms}#tbody.enter tr:nth-child(4){animation-delay:90ms}
+#tbody.enter tr:nth-child(5){animation-delay:120ms}#tbody.enter tr:nth-child(6){animation-delay:150ms}
+#tbody.enter tr:nth-child(7){animation-delay:180ms}#tbody.enter tr:nth-child(8){animation-delay:210ms}
+@keyframes rows-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#panel{animation:panel-in var(--d-panel) var(--e-out) both}
+@keyframes panel-in{from{opacity:0;transform:scale(.96) translateY(-4px)}to{opacity:1;transform:none}}
+#lock.shake{animation:shake 300ms var(--e-io)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}
+  40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.kpi:nth-child(1){animation-delay:0ms}.kpi:nth-child(2){animation-delay:40ms}
+.kpi:nth-child(3){animation-delay:80ms}.kpi:nth-child(4){animation-delay:120ms}
+.kpi:nth-child(5){animation-delay:160ms}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -2529,6 +2561,8 @@ function render(){
     return `<tr data-iso="${r.iso}">${tds}</tr>`;
   }).join("");
   document.querySelectorAll("#tbody tr").forEach(tr=>tr.onclick=()=>focusCountry(tr.dataset.iso));
+  const tb=document.getElementById("tbody");
+  tb.classList.remove("enter"); void tb.offsetWidth; tb.classList.add("enter");
   document.getElementById("count").textContent=rows.length+" of "+ROWS.length+" countries";
   document.getElementById("foot").innerHTML=
     "Country panel drawn from World Bank World Development Indicators, latest observation per series. "+

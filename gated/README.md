@@ -1,34 +1,22 @@
-# Distribution Grid Dashboard
+# DashDist
 
-Country panel on electricity distribution: access, consumption and network losses.
+Distribution grid dashboard for 113 countries. Access gap, consumption and
+losses, network length, and a 2D, 3D and globe map of the predicted grid.
 
-Live: https://electrifysimon.github.io/distribution-grid-dashboard/
+Live: https://electrifysimon.github.io/dashdist/
+Passphrase: on request
 
-Passphrase: shared separately.
+## Stack
 
-## Data
-
-World Bank World Development Indicators, latest available year per series (2010 to 2025):
-
-- `EG.ELC.ACCS.ZS` access to electricity, % of population
-- `EG.ELC.ACCS.UR.ZS` access, urban
-- `EG.ELC.ACCS.RU.ZS` access, rural
-- `EG.ELC.LOSS.ZS` electric power transmission and distribution losses, % of output
-- `EG.USE.ELEC.KH.PC` electric power consumption per capita
-- `SP.POP.TOTL` population
-- `NY.GDP.PCAP.CD` GDP per capita
-
-Countries under 5 million population are excluded. Unserved population is derived as population x (1 - access rate).
-
-## Scope
-
-Three tables: access gap, consumption and losses, data coverage. Network asset data (line length, transformer capacity) and distribution capex are absent because no public country series exists. That layer needs a primary survey.
+- MapLibre GL JS 6.19, deck.gl 9.4, OpenFreeMap basemap, no API keys
+- Static single-file gate via Staticrypt 3.5.4
+- Data: World Bank WDI, ESMAP gridfinder, Natural Earth
 
 ## Build
 
 ```
-python3 build.py       # src/data.json -> data.js
-python3 make_dist.py   # gate-free single file -> dist/index.html
-npx staticrypt dist/index.html -p <passphrase> -d gated --remember 0 --short
-cp gated/index.html index.html
+python3 build.py        # merge src/data.json with data/network.json
+bash publish.sh         # inline, encrypt, stage gated/
 ```
+
+Data sources and file hashes: `data/MANIFEST.md`.
