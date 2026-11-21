@@ -89,34 +89,34 @@ body{background-color:var(--bg);background-image:radial-gradient(1200px 620px at
 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
 /* masthead */
-.masthead{padding:20px 0 0}
-.mast-top{display:flex;align-items:center;gap:14px;padding-bottom:11px;border-bottom:1px solid var(--line)}
-.wordmark{font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase}
+.masthead{padding:16px 0 0}
+.mast-top{display:flex;align-items:center;gap:16px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.wordmark{font-weight:600;font-size:11.5px;letter-spacing:.16em;text-transform:uppercase}
 .mast-note{font-size:12px;color:var(--muted)}
-.themebtn{margin-left:auto;display:inline-flex;align-items:center;gap:7px;background:none;box-shadow:none;
-  border:0;color:var(--muted);padding:0;min-height:36px;font-size:12px;cursor:pointer}
-.themebtn:hover{color:var(--ink)}
-.display{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif;font-size:clamp(30px,4.4vw,54px);
-  line-height:1.02;letter-spacing:-.028em;font-weight:600;margin:34px 0 16px;max-width:22ch;text-wrap:balance}
-.display #hero-n{font-variant-numeric:tabular-nums}
-.lede{margin:0 0 26px;max-width:62ch;color:var(--muted);font-size:15px;line-height:1.55}
-.meta{display:flex;flex-wrap:wrap;gap:8px 26px;color:var(--muted);font-size:12px;
-  border-top:1px solid var(--line);padding-top:12px}
+.meta{margin-left:auto;display:flex;flex-wrap:wrap;gap:4px 18px;color:var(--muted);font-size:11.5px;border:0;padding:0}
 .meta b{color:var(--ink);font-weight:600}
+.themebtn{display:inline-flex;align-items:center;gap:6px;background:none;box-shadow:none;border:0;
+  color:var(--muted);padding:0;min-height:32px;font-size:12px;cursor:pointer;margin-left:6px}
+.themebtn:hover{color:var(--ink)}
+.display{font-size:clamp(19px,2vw,23px);line-height:1.25;letter-spacing:-.015em;font-weight:600;
+  margin:14px 0 12px;font-family:"Bricolage Grotesque","Instrument Sans",sans-serif}
+.display #hero-n{font-variant-numeric:tabular-nums}
 
 /* headline figures: a measured strip, not cards */
 .strip{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);
-  border-bottom:1px solid var(--line);margin:0 0 22px}
-.strip .s{padding:18px 20px 18px 0;border-right:1px solid var(--line)}
-.strip .s+.s{padding-left:20px}
+  border-bottom:1px solid var(--line);margin:0 0 16px}
+.strip .s{padding:11px 16px 11px 0;border-right:1px solid var(--line)}
+.strip .s+.s{padding-left:16px}
 .strip .s:last-child{border-right:0;padding-right:0}
-.strip .n{font-size:clamp(22px,2.6vw,30px);font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-.strip .l{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.35;display:flex;gap:6px;align-items:flex-start}
-.strip .l svg{width:13px;height:13px;margin-top:2px;opacity:.7}
+.strip .n{font-size:clamp(17px,1.8vw,21px);font-weight:600;letter-spacing:-.015em;font-variant-numeric:tabular-nums}
+.strip .l{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.3;display:flex;gap:5px;align-items:flex-start}
+.strip .l svg{width:12px;height:12px;margin-top:2px;opacity:.65}
 @media(max-width:760px){
   .strip{grid-template-columns:1fr 1fr}
   .strip .s:nth-child(2n){border-right:0;padding-right:0}
   .strip .s:nth-child(n+3){border-top:1px solid var(--line)}
+  .mast-note{display:none}
+  .meta{margin-left:0;order:3;width:100%}
 }
 
 /* map */
@@ -288,19 +288,17 @@ input[type=search]::placeholder{color:var(--muted);opacity:1}
     <div class="mast-top">
       <span class="wordmark">DashDist</span>
       <span class="mast-note">Distribution grid indicators</span>
+      <div class="meta">
+        <span><b id="m-count">113</b> countries</span>
+        <span>Year <b id="m-year">2024</b></span>
+        <span><b id="m-date">__BUILD_DATE__</b></span>
+        <span>CC BY 4.0</span>
+      </div>
       <button class="themebtn" id="theme" aria-label="Switch to light theme">
         <span id="theme-i" aria-hidden="true"><svg class="ic" aria-hidden="true"><use href="#i-moon"/></svg></span><span id="theme-t">Light</span>
       </button>
     </div>
-    <h1 class="display"><span id="hero-n">566</span> million people have no grid connection.</h1>
-    <p class="lede">Measured against the distribution network that would reach them. Access, technical losses,
-      consumption and predicted line length for the 113 countries above five million people.</p>
-    <div class="meta">
-      <span><b id="m-count">113</b> countries</span>
-      <span>Reference year <b id="m-year">2024</b></span>
-      <span>Published <b id="m-date">__BUILD_DATE__</b></span>
-      <span>Licence <b>CC BY 4.0</b></span>
-    </div>
+    <h1 class="display"><span id="hero-n">566</span> million people have no grid connection</h1>
   </header>
 
   <section class="strip" id="kpis" aria-label="Headline indicators"></section>
