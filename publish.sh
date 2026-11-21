@@ -15,11 +15,13 @@ p = pathlib.Path("build/index.html")
 html = p.read_text()
 data = pathlib.Path("data.js").read_text()
 html = html.replace('<script src="data.js"></script>', "<script>" + data + "</script>")
+import datetime
+html = html.replace("__BUILD_DATE__", datetime.date.today().strftime("%d %B %Y").lstrip("0"))
 # staticrypt is the only gate: strip the in-page lock and start immediately
 html = re.sub(r'<section id="lock".*?</section>\s*', "", html, flags=re.S)
 html = html.replace('<div class="wrap" id="app" hidden>', '<div class="wrap" id="app">')
 html = re.sub(r"/\* GATE-START \*/.*?/\* GATE-END \*/", "start();", html, flags=re.S)
-for needle in ("GATE-START", 'id="lock"'):
+for needle in ("GATE-START", 'id="lock"', "__BUILD_DATE__"):
     if needle in html:
         raise SystemExit("build failed, leftover: " + needle)
 p.write_text(html)

@@ -239,7 +239,7 @@ input[type=search]::placeholder{color:var(--muted);opacity:1}
     <div class="meta">
       <span><b id="m-count">113</b> countries</span>
       <span>Reference year <b id="m-year">2024</b></span>
-      <span>Published <b id="m-date">20 November 2026</b></span>
+      <span>Published <b id="m-date">21 November 2026</b></span>
       <span>Licence <b>CC BY 4.0</b></span>
     </div>
   </header>
@@ -2658,7 +2658,8 @@ function start(){
   ROWS=D.rows.map(r=>Object.assign({},r,{region:(r.region||"").trim()}));
   ROWS.forEach(r=>BY_ISO[r.iso]=r);
   document.getElementById("m-count").textContent=ROWS.length;
-  document.getElementById("m-year").textContent=D.meta.as_of||"";
+  const yrs=ROWS.flatMap(r=>[r.year_access,r.year_losses,r.year_kwh]).filter(y=>y);
+  document.getElementById("m-year").textContent=yrs.length?String(Math.max(...yrs)):"n/a";
   buildKpis(); buildFilters(); buildFoot(); render(); initMap(); syncThemeButton(); updateLegend();
 }
 
