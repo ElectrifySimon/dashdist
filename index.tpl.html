@@ -287,14 +287,13 @@ input[type=search]::placeholder{color:var(--muted);opacity:1}
     <div class="brand"><span class="mark" aria-hidden="true">DD</span>
       <div class="brand-text">
         <h1>DashDist</h1>
-        <p class="subtitle">Distribution grid indicators for the 113 countries with more than five million people</p>
+        <p class="subtitle" id="sub"></p>
       </div>
     </div>
     <button class="themebtn" id="theme" aria-label="Switch to light theme">
       <span id="theme-i" aria-hidden="true"><svg class="ic" aria-hidden="true"><use href="#i-moon"/></svg></span><span id="theme-t">Light</span>
     </button>
-    <p class="lede">Access gaps, technical losses, consumption, and the predicted length and density of the
-      distribution network. Sources and definitions at the foot of the page.</p>
+    
     <div class="meta">
       <span><b id="m-count">113</b> countries</span>
       <span>Reference year <b id="m-year">2024</b></span>
@@ -463,6 +462,8 @@ function buildKpis(){
     [lossMed.toFixed(1)+"%","Median T&D losses","trending-down"],
     [String(lossHigh),"Countries at 15% losses or more","triangle-alert"]
   ];
+  document.getElementById("sub").textContent=
+    "Distribution grid indicators for the "+ROWS.length+" countries with more than five million people";
   document.getElementById("kpis").innerHTML=kpis.map(([n,l,i])=>
     `<div class="kpi"><div class="n">${n}</div><div class="l">
       <svg class="ic" aria-hidden="true"><use href="#i-${i}"/></svg>${l}</div></div>`).join("");
