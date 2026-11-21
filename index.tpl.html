@@ -441,9 +441,6 @@ function start(){
   const D=window.TRACKER_DATA;
   ROWS=D.rows.map(r=>Object.assign({},r,{region:(r.region||"").trim()}));
   ROWS.forEach(r=>BY_ISO[r.iso]=r);
-  document.getElementById("m-count").textContent=ROWS.length;
-  const yrs=ROWS.flatMap(r=>[r.year_access,r.year_losses,r.year_kwh]).filter(y=>y);
-  document.getElementById("m-year").textContent=yrs.length?String(Math.max(...yrs)):"n/a";
   buildKpis(); buildFilters(); buildFoot(); render(); initMap(); syncThemeButton(); updateLegend();
 }
 
