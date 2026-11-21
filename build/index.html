@@ -90,7 +90,10 @@ body{background-color:var(--bg);background-image:radial-gradient(1200px 620px at
 
 /* masthead */
 .masthead{display:grid;grid-template-columns:1fr auto;gap:12px 24px;align-items:start;padding-bottom:20px;border-bottom:1px solid var(--line)}
-.brand{display:flex;align-items:center;gap:12px}
+.brand{display:flex;align-items:flex-start;gap:12px}
+.brand-text{display:flex;flex-direction:column;gap:4px}
+.brand-text h1{line-height:1.15}
+.subtitle{margin:0;font-size:13px;line-height:1.45;color:var(--muted);max-width:62ch}
 .mark{width:34px;height:34px;border-radius:10px;background:var(--accent);color:var(--accent-ink);
   display:grid;place-items:center;font-weight:700;font-size:13px;letter-spacing:.5px}
 h1{margin:0;font-size:clamp(21px,2.2vw,27px);font-weight:600;letter-spacing:-.02em;font-family:"Bricolage Grotesque","Instrument Sans",sans-serif}
@@ -273,12 +276,17 @@ input[type=search]::placeholder{color:var(--muted);opacity:1}
 
 <div class="wrap" id="app">
   <header class="masthead">
-    <div class="brand"><span class="mark" aria-hidden="true">DD</span><h1>DashDist</h1></div>
+    <div class="brand"><span class="mark" aria-hidden="true">DD</span>
+      <div class="brand-text">
+        <h1>DashDist</h1>
+        <p class="subtitle">Distribution grid indicators for the 113 countries with more than five million people</p>
+      </div>
+    </div>
     <button class="themebtn" id="theme" aria-label="Switch to light theme">
       <span id="theme-i" aria-hidden="true"><svg class="ic" aria-hidden="true"><use href="#i-moon"/></svg></span><span id="theme-t">Light</span>
     </button>
-    <p class="lede">Distribution grid indicators for countries above five million people: access gaps,
-      technical losses, consumption, and the predicted length and density of the distribution network.</p>
+    <p class="lede">Access gaps, technical losses, consumption, and the predicted length and density of the
+      distribution network. Sources and definitions at the foot of the page.</p>
     <div class="meta">
       <span><b id="m-count">113</b> countries</span>
       <span>Reference year <b id="m-year">2024</b></span>
