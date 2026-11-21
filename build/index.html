@@ -98,7 +98,9 @@ body{background-color:var(--bg);background-image:radial-gradient(1200px 620px at
   display:grid;place-items:center;font-weight:700;font-size:13px;letter-spacing:.5px}
 h1{margin:0;font-size:clamp(21px,2.2vw,27px);font-weight:600;letter-spacing:-.02em;font-family:"Bricolage Grotesque","Instrument Sans",sans-serif}
 .lede{margin:8px 0 0;grid-column:1/-1;max-width:70ch;color:var(--muted);font-size:14.5px}
-.meta{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px 18px;color:var(--muted);font-size:12.5px}
+.footmeta{display:flex;flex-wrap:wrap;gap:4px 20px;color:var(--muted);font-size:12px;margin:0 0 16px;
+  padding-bottom:14px;border-bottom:1px solid var(--line)}
+.footmeta b{color:var(--ink);font-weight:600}
 .meta span{display:inline-flex;align-items:center;gap:6px}
 .meta b{color:var(--ink);font-weight:600}
 .themebtn{grid-row:1;grid-column:2;justify-self:end;display:inline-flex;align-items:center;gap:8px;
@@ -286,12 +288,7 @@ input[type=search]::placeholder{color:var(--muted);opacity:1}
       <span id="theme-i" aria-hidden="true"><svg class="ic" aria-hidden="true"><use href="#i-moon"/></svg></span><span id="theme-t">Light</span>
     </button>
     
-    <div class="meta">
-      <span><b id="m-count"></b> countries</span>
-      <span>Reference year <b id="m-year">2024</b></span>
-      <span>Published <b id="m-date">21 November 2026</b></span>
-      <span>Licence <b>CC BY 4.0</b></span>
-    </div>
+    
   </header>
 
   <section class="kpis" id="kpis" aria-label="Headline indicators"></section>
@@ -2739,6 +2736,12 @@ function buildFilters(){
 
 function buildFoot(){
   document.getElementById("foot").innerHTML=`
+    <p class="footmeta">
+      <span><b>${ROWS.length}</b> countries</span>
+      <span>Reference year <b>${ROWS.flatMap(r=>[r.year_access,r.year_losses,r.year_kwh]).filter(y=>y).reduce((a,b)=>Math.max(a,b),0)||"n/a"}</b></span>
+      <span>Published <b>21 November 2026</b></span>
+      <span>Licence CC BY 4.0</span>
+    </p>
     <h2>Sources and notes</h2>
     <ul>
       <li>Country indicators: World Bank World Development Indicators, latest observation per series,
