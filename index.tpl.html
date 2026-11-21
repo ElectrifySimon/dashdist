@@ -288,7 +288,7 @@ input[type=search]::placeholder{color:var(--muted);opacity:1}
       <button class="btn" id="gridtoggle" aria-pressed="true">Network lines</button>
     </div>
 
-    <div id="map" role="region" aria-label="World map of distribution grid indicators">
+    <div id="map" role="region" aria-label="World map of distribution grid indicators" tabindex="0">
       <div id="panel" role="dialog" aria-live="polite"></div>
       <div class="mapnote" id="mapnote">Predicted network density</div>
       <div class="legend" id="legend" aria-hidden="true"></div>
@@ -307,18 +307,18 @@ input[type=search]::placeholder{color:var(--muted);opacity:1}
   </div>
 
   <div class="tabs" role="tablist" aria-label="Views">
-    <button class="tab" role="tab" data-t="access" aria-selected="true" aria-controls="tblwrap">Access gap</button>
-    <button class="tab" role="tab" data-t="perf" aria-selected="false" aria-controls="tblwrap">Consumption and losses</button>
-    <button class="tab" role="tab" data-t="net" aria-selected="false" aria-controls="tblwrap">Network</button>
-    <button class="tab" role="tab" data-t="cover" aria-selected="false" aria-controls="tblwrap">Data coverage</button>
-    <button class="tab" role="tab" data-t="charts" aria-selected="false" aria-controls="charts">Charts</button>
-    <button class="tab" role="tab" data-t="gpu" aria-selected="false" aria-controls="gpu">Charts GPU</button>
+    <button class="tab" role="tab" id="tab-access" data-t="access" aria-selected="true" aria-controls="tblwrap" tabindex="0">Access gap</button>
+    <button class="tab" role="tab" id="tab-perf" data-t="perf" aria-selected="false" aria-controls="tblwrap" tabindex="-1">Consumption and losses</button>
+    <button class="tab" role="tab" id="tab-net" data-t="net" aria-selected="false" aria-controls="tblwrap" tabindex="-1">Network</button>
+    <button class="tab" role="tab" id="tab-cover" data-t="cover" aria-selected="false" aria-controls="tblwrap" tabindex="-1">Data coverage</button>
+    <button class="tab" role="tab" id="tab-charts" data-t="charts" aria-selected="false" aria-controls="charts" tabindex="-1">Charts</button>
+    <button class="tab" role="tab" id="tab-gpu" data-t="gpu" aria-selected="false" aria-controls="gpu" tabindex="-1">Charts GPU</button>
   </div>
 
-  <section id="charts" class="charts" role="tabpanel" aria-label="Charts" hidden></section>
-  <section id="gpu" class="charts" role="tabpanel" aria-label="Charts rendered on the GPU" hidden></section>
+  <section id="charts" class="charts" role="tabpanel" aria-labelledby="tab-charts" tabindex="0" hidden></section>
+  <section id="gpu" class="charts" role="tabpanel" aria-labelledby="tab-gpu" tabindex="0" hidden></section>
 
-  <div class="tblwrap" id="tblwrap" role="tabpanel">
+  <div class="tblwrap" id="tblwrap" role="tabpanel" aria-labelledby="tab-access" tabindex="0">
     <table id="tbl">
       <caption id="cap">Countries ranked by people without electricity access.</caption>
       <thead id="thead"></thead>
@@ -474,7 +474,11 @@ function render(){
   document.getElementById("gpu").hidden=!isGpu;
   document.getElementById("tblwrap").hidden=chartMode;
   document.getElementById("csv").hidden=chartMode;
-  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",String(t.dataset.t===TAB)));
+  document.querySelectorAll(".tab").forEach(t=>{
+    const on=t.dataset.t===TAB;
+    t.setAttribute("aria-selected",String(on));
+    t.tabIndex=on?0:-1;
+  });
   if(isCharts){ drawCharts(); document.getElementById("count").textContent=countLabel(); return; }
   if(isGpu){ drawGPU(); document.getElementById("count").textContent=countLabel(); return; }
   const cols=COLS[TAB], th=document.getElementById("thead");
@@ -507,7 +511,13 @@ function render(){
     }).join("");
     return `<tr data-iso="${esc(r.iso)}" style="--i:${i}" data-access="${r.access??""}" data-unserved="${r.unserved_m??""}" data-losses="${r.losses??""}">${tds}</tr>`;
   }).join("");
-  tb.querySelectorAll("tr").forEach(tr=>tr.onclick=()=>focusCountry(tr.dataset.iso));
+  tb.querySelectorAll("tr").forEach(tr=>{
+    tr.tabIndex=0;
+    tr.onclick=()=>focusCountry(tr.dataset.iso,true,tr);
+    tr.onkeydown=e=>{
+      if(e.key==="Enter"||e.key===" "){ e.preventDefault(); focusCountry(tr.dataset.iso,true,tr); }
+    };
+  });
   tb.classList.remove("enter"); void tb.offsetWidth; tb.classList.add("enter");
   document.getElementById("count").textContent=countLabel(rows.length);
 }
@@ -766,7 +776,7 @@ function deckLayers(){
     getElevation:d=>extrusion?(d.properties.unserved_m||0)*14000:0,
     elevationScale:1, material:{ambient:.55,diffuse:.6,shininess:12,specularColor:[40,60,60]},
     pickable:true,
-    onClick:info=>{if(info.object) focusCountry(info.object.properties.iso,false);},
+    onClick:info=>{if(info.object) focusCountry(info.object.properties.iso,false,document.getElementById("map"));},
     updateTriggers:{getFillColor:[m,isDark()],getElevation:[extrusion],getLineColor:[isDark()]}
   })];
   if(showLines){
@@ -902,9 +912,18 @@ function refreshGrid(){
   },250);
 }
 
-function focusCountry(iso,fly=true){
+let panelOpener=null;
+function closePanel(){
+  const p=document.getElementById("panel");
+  if(!p||p.style.display!=="block") return;
+  p.style.display="none";
+  const o=panelOpener; panelOpener=null;
+  if(o&&o.isConnected&&typeof o.focus==="function") o.focus({preventScroll:true});
+}
+function focusCountry(iso,fly=true,opener=null){
   const r=BY_ISO[iso]; if(!r) return;
   const p=document.getElementById("panel");
+  panelOpener=opener||document.activeElement;
   p.style.display="block";
   const row=(k,v)=>`<div class="row"><span class="k">${k}</span><span class="v">${v}</span></div>`;
   const n=v=>v==null?'<span class="na">n/a</span>':Number(v).toLocaleString("en-GB");
@@ -917,7 +936,8 @@ function focusCountry(iso,fly=true){
     ${row("Consumption",n(r.kwh_pc)+" kWh per capita")}
     ${row("Network",n(r.net_km)+" km")}
     ${row("Density",n(r.km_per_1000km2)+" km per 1,000 km²")}`;
-  p.querySelector(".x").onclick=()=>{p.style.display="none";};
+  p.querySelector(".x").onclick=closePanel;
+  requestAnimationFrame(()=>{ const x=p.querySelector(".x"); if(x) x.focus({preventScroll:true}); });
   if(fly&&GEO){
     const f=GEO.features.find(x=>x.properties.iso===iso);
     if(f){
@@ -946,7 +966,8 @@ function setTheme(t){
 }
 document.getElementById("theme").onclick=()=>setTheme(isDark()?"light":"dark");
 
-document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+const TABLIST=[...document.querySelectorAll(".tab")];
+function activateTab(t){
   TAB=t.dataset.t;
   const m=TABMETRIC[TAB];
   if(m){ METRIC=m; const sel=document.getElementById("metric"); if(sel) sel.value=m; refreshDeck(); updateLegend(); }
@@ -959,6 +980,25 @@ document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
       if(sec) sec.scrollIntoView({behavior:"smooth",block:"start"});
     }
   });
+}
+TABLIST.forEach((t,i)=>{
+  t.onclick=()=>activateTab(t);
+  t.onkeydown=e=>{
+    let n=-1;
+    if(e.key==="ArrowRight") n=(i+1)%TABLIST.length;
+    else if(e.key==="ArrowLeft") n=(i-1+TABLIST.length)%TABLIST.length;
+    else if(e.key==="Home") n=0;
+    else if(e.key==="End") n=TABLIST.length-1;
+    if(n>=0){ e.preventDefault(); activateTab(TABLIST[n]); TABLIST[n].focus(); }
+  };
+});
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closePanel(); });
+document.addEventListener("pointerdown",e=>{
+  const p=document.getElementById("panel");
+  if(!p||p.style.display!=="block") return;
+  if(p.contains(e.target)) return;
+  if(e.target.closest("#tbody")||e.target.closest("#map")) return;
+  closePanel();
 });
 document.getElementById("q").oninput=render;
 document.getElementById("region").onchange=render;
