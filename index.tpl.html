@@ -64,45 +64,42 @@ body{background:var(--bg);color:var(--ink);
 /* masthead */
 .masthead{display:grid;grid-template-columns:1fr auto;gap:12px 24px;align-items:start;padding-bottom:20px;border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:12px}
-.mark{width:34px;height:34px;border-radius:9px;background:var(--accent);color:var(--accent-ink);
+.mark{width:34px;height:34px;border-radius:8px;background:var(--accent);color:var(--accent-ink);
   display:grid;place-items:center;font-weight:700;font-size:13px;letter-spacing:.5px}
-h1{margin:0;font-size:clamp(20px,2.1vw,26px);font-weight:650;letter-spacing:-.4px}
+h1{margin:0;font-size:clamp(20px,2.1vw,26px);font-weight:650;letter-spacing:0}
 .lede{margin:8px 0 0;grid-column:1/-1;max-width:70ch;color:var(--muted);font-size:14.5px}
 .meta{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px 18px;color:var(--muted);font-size:12.5px}
 .meta span{display:inline-flex;align-items:center;gap:6px}
 .meta b{color:var(--ink);font-weight:600}
 .themebtn{grid-row:1;grid-column:2;justify-self:end;display:inline-flex;align-items:center;gap:8px;
-  background:var(--surface);border:1px solid var(--line);color:var(--ink);border-radius:9px;
+  background:var(--surface);border:1px solid var(--line);color:var(--ink);border-radius:8px;
   padding:0 14px;min-height:44px;font-size:13px;cursor:pointer}
 .themebtn:hover{border-color:var(--accent);color:var(--accent)}
 
 /* kpis */
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px;margin:24px 0}
-.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px;
-  position:relative;overflow:hidden;box-shadow:var(--shadow)}
-.kpi:after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,var(--wash),transparent 62%);pointer-events:none}
-.kpi .n{font-size:clamp(20px,2.2vw,25px);font-weight:650;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
-.kpi .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-top:4px}
+.kpi{background:var(--surface2);border:0;border-radius:12px;padding:16px 16px 14px;position:relative}
+.kpi .n{font-size:clamp(20px,2.2vw,25px);font-weight:650;letter-spacing:-.2px;font-variant-numeric:tabular-nums}
+.kpi .l{font-size:12px;color:var(--muted);margin-top:5px}
 
 /* map */
 .mapblock{margin-top:8px}
 .mapbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 10px}
-.seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:9px;overflow:hidden}
-.seg button{background:transparent;border:0;color:var(--muted);padding:0 16px;min-height:44px;font-size:13px;cursor:pointer}
-.seg button+button{border-left:1px solid var(--line)}
+.seg{display:flex;gap:4px}
+.seg button{background:var(--surface);border:0;border-radius:8px;color:var(--muted);padding:0 16px;min-height:44px;font-size:13px;cursor:pointer}
 .seg button.on{background:var(--accent);color:var(--accent-ink);font-weight:650}
 select,input[type=search],.btn{background:var(--surface);border:1px solid var(--line);color:var(--ink);
-  border-radius:9px;padding:0 14px;font-size:14px;min-height:44px;outline:none;font-family:inherit}
+  border-radius:8px;padding:0 14px;font-size:14px;min-height:44px;outline:none;font-family:inherit}
 select{cursor:pointer;max-width:100%}
 .btn{cursor:pointer;display:inline-flex;align-items:center;gap:8px;justify-content:center}
 .btn:hover{border-color:var(--accent);color:var(--accent)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
 .btn.primary:hover{filter:brightness(1.05);color:var(--accent-ink)}
-#map{height:clamp(340px,58vh,640px);border:1px solid var(--line);border-radius:14px;overflow:hidden;
-  position:relative;background:var(--surface);box-shadow:var(--shadow)}
-.mapnote,.legend{position:absolute;z-index:2;background:color-mix(in srgb,var(--surface) 92%,transparent);
-  border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:12px;color:var(--muted);
-  backdrop-filter:blur(6px);max-width:min(58ch,72%)}
+#map{height:clamp(340px,58vh,640px);border:0;border-radius:12px;overflow:hidden;
+  position:relative;background:var(--surface)}
+.mapnote,.legend{position:absolute;z-index:2;background:var(--surface);
+  border:0;border-radius:8px;padding:9px 12px;font-size:12px;color:var(--muted);
+  max-width:min(58ch,72%)}
 .mapnote{left:12px;bottom:12px}
 .legend{right:12px;bottom:12px;min-width:190px}
 .legend .lg-t{color:var(--ink);font-weight:600;font-size:12px;margin-bottom:6px}
@@ -111,7 +108,7 @@ select{cursor:pointer;max-width:100%}
 .legend .lg-k{display:flex;align-items:center;gap:7px;margin-top:7px;font-size:11px}
 .legend .lg-k i{width:16px;height:3px;border-radius:2px;display:inline-block}
 #panel{position:absolute;top:12px;right:12px;z-index:3;width:min(280px,calc(100% - 24px));
-  background:color-mix(in srgb,var(--surface) 97%,transparent);border:1px solid var(--line);
+  background:var(--surface);border:0;
   border-radius:12px;padding:16px;font-size:13px;display:none;box-shadow:var(--shadow)}
 #panel h3{margin:0 0 10px;font-size:15px;display:flex;justify-content:space-between;align-items:center;gap:8px}
 #panel .x{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;padding:4px}
@@ -127,21 +124,21 @@ input[type=search]:focus,select:focus{border-color:var(--accent)}
 .count{color:var(--muted);font-size:12.5px;margin-left:auto;white-space:nowrap}
 .tabs{display:flex;gap:8px;margin:0 0 14px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .tabs::-webkit-scrollbar{display:none}
-.tab{background:var(--surface);border:1px solid var(--line);color:var(--muted);white-space:nowrap;
-  padding:0 15px;min-height:44px;display:inline-flex;align-items:center;border-radius:9px;font-size:13px;cursor:pointer;
+.tab{background:var(--surface);border:0;color:var(--muted);white-space:nowrap;
+  padding:0 15px;min-height:44px;display:inline-flex;align-items:center;border-radius:8px;font-size:13px;cursor:pointer;
   transition:background var(--d-feedback) var(--e-out),color var(--d-feedback) var(--e-out),border-color var(--d-feedback) var(--e-out),transform 90ms var(--e-out)}
-.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:650}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);font-weight:650}
 .tab:active{transform:scale(.97)}
 
 /* table */
-.tblwrap{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:auto;
+.tblwrap{background:var(--surface);border:0;border-radius:12px;overflow:auto;
   box-shadow:var(--shadow);max-height:min(68vh,760px)}
 table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;white-space:nowrap}
 caption{text-align:left;padding:14px 16px 4px;color:var(--muted);font-size:12.5px}
 th,td{padding:10px 14px;text-align:right;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
 th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
 thead th{position:sticky;top:0;z-index:1;background:var(--surface2);color:var(--muted);font-weight:600;
-  font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;cursor:pointer;user-select:none}
+  font-size:11.5px;letter-spacing:0;cursor:pointer;user-select:none}
 thead th:hover{color:var(--ink)}
 thead th .ar{opacity:.45;font-size:9px;margin-left:5px}
 thead th[aria-sort] .ar{opacity:1;color:var(--accent)}
@@ -150,14 +147,13 @@ tbody tr:hover td{background:var(--surface2)}
 td.name{font-weight:550}
 td:first-child{position:sticky;left:0;background:var(--surface);z-index:1}
 tbody tr:hover td:first-child{background:var(--surface2)}
-.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10.5px;
-  border:1px solid var(--line);color:var(--muted)}
+.na{color:var(--muted);font-weight:400}
 .bad{color:var(--bad);font-weight:600}
 .warn{color:var(--warn);font-weight:600}
 
 /* charts */
 .charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:14px;margin:4px 0 8px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 16px 10px;
+.card{background:var(--surface);border:0;border-radius:12px;padding:16px 16px 10px;
   box-shadow:var(--shadow)}
 .card h3{margin:0;font-size:13.5px;font-weight:600;letter-spacing:.01em}
 .card p{margin:3px 0 10px;font-size:12px;color:var(--muted)}
@@ -168,28 +164,28 @@ tbody tr:hover td:first-child{background:var(--surface2)}
 
 /* footer */
 .foot{margin-top:28px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;line-height:1.7}
-.foot h2{font-size:11px;text-transform:uppercase;letter-spacing:.7px;margin:0 0 8px;color:var(--ink)}
+.foot h2{font-size:12px;margin:0 0 8px;color:var(--ink)}
 .foot ul{margin:0 0 10px;padding-left:18px}
 .foot li{margin:2px 0}
-.foot a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--accent) 40%,transparent)}
-.foot a:hover{border-bottom-color:var(--accent)}
+.foot a{color:var(--accent);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
+.foot a:hover{text-decoration-thickness:2px}
 
 /* gate */
-#lock{max-width:370px;margin:16vh auto;background:var(--surface);border:1px solid var(--line);
-  border-radius:14px;padding:28px;box-shadow:var(--shadow)}
+#lock{max-width:370px;margin:16vh auto;background:var(--surface);border:0;
+  border-radius:12px;padding:28px;box-shadow:var(--shadow)}
 #lock h2{margin:0 0 6px;font-size:19px}
 #lock p{margin:0 0 16px;color:var(--muted);font-size:13px}
 #lock input{width:100%;margin-bottom:10px;background:var(--bg);border:1px solid var(--line);
-  color:var(--ink);border-radius:9px;padding:12px;font-size:16px}
+  color:var(--ink);border-radius:8px;padding:12px;font-size:16px}
 #lock button{width:100%;background:var(--accent);border:0;color:var(--accent-ink);font-weight:650;
-  padding:12px;border-radius:9px;font-size:15px;cursor:pointer;min-height:44px}
+  padding:12px;border-radius:8px;font-size:15px;cursor:pointer;min-height:44px}
 #err{color:var(--bad);font-size:12px;min-height:16px;margin-top:8px}
 
 /* motion */
 :root{--e-out:cubic-bezier(.16,1,.3,1);--e-in:cubic-bezier(.7,0,.84,0);--e-io:cubic-bezier(.65,0,.35,1);
   --d-feedback:120ms;--d-ui:220ms;--d-panel:320ms}
 .kpi{animation:kpi-in 420ms var(--e-out) both;transition:transform var(--d-ui) var(--e-out),border-color var(--d-ui) var(--e-out)}
-.kpi:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.kpi:hover{transform:translateY(-2px)}
 .kpi:nth-child(2){animation-delay:40ms}.kpi:nth-child(3){animation-delay:80ms}
 .kpi:nth-child(4){animation-delay:120ms}.kpi:nth-child(5){animation-delay:160ms}
 @keyframes kpi-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
@@ -207,7 +203,7 @@ tbody tr:hover td:first-child{background:var(--surface2)}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(6px)}
   60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:7px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
 input[type=search]::placeholder{color:var(--muted);opacity:1}
 [hidden]{display:none!important}
 
@@ -292,7 +288,6 @@ input[type=search]::placeholder{color:var(--muted);opacity:1}
     <label class="sr" for="income">Income group</label>
     <select id="income"><option value="">All income groups</option></select>
     <button class="btn" id="csv">CSV</button>
-    <button class="btn" id="json">JSON</button>
     <span class="count" id="count" aria-live="polite"></span>
   </div>
 
@@ -387,7 +382,7 @@ const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n)
 const isDark = () => document.documentElement.dataset.theme === "dark";
 
 function fmt(v,c){
-  if(v===null||v===undefined||v===""||Number.isNaN(v)) return '<span class="pill">n/a</span>';
+  if(v===null||v===undefined||v===""||Number.isNaN(v)) return '<span class="na">n/a</span>';
   if(c.type==="n") return Number(v).toLocaleString("en-GB",{minimumFractionDigits:c.d||0,maximumFractionDigits:c.d||0});
   return v;
 }
@@ -438,8 +433,7 @@ function buildFoot(){
         <a href="https://energydata.info/dataset/predictive-grid-mapping-2019" target="_blank" rel="noopener">energydata.info</a>, CC BY 4.0.
         Model output, not an asset register; validation is about 70% at 1 km. Network length is computed per country in an equal-area projection.</li>
       <li>Country boundaries: Natural Earth 110m, public domain. Basemap: OpenFreeMap and OpenStreetMap contributors, ODbL.</li>
-      <li>Rendering: MapLibre GL JS 6.19 (BSD-3), deck.gl 9.4 (MIT), Apache ECharts 6.1 (Apache-2.0), ChartGPU 0.4 (MIT).
-        No API key and no third-party data service is queried at runtime; line tiles are generated from the model extract.</li>
+      <li>Rendering: MapLibre, deck.gl, Apache ECharts, ChartGPU. No API key and no third-party data service at runtime.</li>
     </ul>
     <p>Machine-readable export: <a href="data/dashboard.json" type="application/json">data/dashboard.json</a>.
       Field names match the table headings. Unserved people = population x (1 - access rate).
@@ -464,7 +458,6 @@ function render(){
   document.getElementById("gpu").hidden=!isGpu;
   document.getElementById("tblwrap").hidden=chartMode;
   document.getElementById("csv").hidden=chartMode;
-  document.getElementById("json").hidden=chartMode;
   document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",String(t.dataset.t===TAB)));
   if(isCharts){ drawCharts(); document.getElementById("count").textContent=countLabel(); return; }
   if(isGpu){ drawGPU(); document.getElementById("count").textContent=countLabel(); return; }
@@ -900,7 +893,7 @@ function focusCountry(iso,fly=true){
   const p=document.getElementById("panel");
   p.style.display="block";
   const row=(k,v)=>`<div class="row"><span class="k">${k}</span><span class="v">${v}</span></div>`;
-  const n=v=>v==null?'<span class="pill">n/a</span>':Number(v).toLocaleString("en-GB");
+  const n=v=>v==null?'<span class="na">n/a</span>':Number(v).toLocaleString("en-GB");
   p.innerHTML=`<h3>${esc(r.country)}<button class="x" aria-label="Close country panel">×</button></h3>
     ${row("Population",n(r.pop_m)+" m")}
     ${row("Access",n(r.access)+"%")}
@@ -957,7 +950,6 @@ document.getElementById("q").oninput=render;
 document.getElementById("region").onchange=render;
 document.getElementById("income").onchange=render;
 document.getElementById("csv").onclick=downloadCsv;
-document.getElementById("json").onclick=downloadJson;
 window.addEventListener("resize",()=>{
   CHARTS.forEach(c=>{try{c.resize()}catch(e){}});
   try{MAP&&MAP.resize()}catch(e){}
