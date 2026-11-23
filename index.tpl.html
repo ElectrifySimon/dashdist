@@ -484,7 +484,7 @@ function hist(vals,bins){
 function spark(bars){
   if(!bars) return "";
   const w=100/bars.length;
-  const rects=bars.map((h,i)=>`<rect x="${(i*w).toFixed(2)}" y="${22-h}" width="${(w*.62).toFixed(2)}" height="${h||1}" rx="1"/>`).join("");
+  const rects=bars.map((h,i)=>`<rect x="${(i*w).toFixed(2)}" y="${22-h}" width="${(w*.62).toFixed(2)}" height="${h||1}" rx="1" fill="currentColor"/>`).join("");
   return `<svg class="spark" viewBox="0 0 100 22" preserveAspectRatio="none" aria-hidden="true">${rects}</svg>`;
 }
 function buildKpis(){
