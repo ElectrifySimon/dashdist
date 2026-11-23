@@ -3518,7 +3518,7 @@ function initBg(){
           +Math.sin(u*6.2832*0.42+i*0.90+t*0.03)*22*dpr;
         if(x<=-pad+0.001) ctx.moveTo(x,y); else ctx.lineTo(x,y);
       }
-      ctx.globalAlpha=0.030+0.032*Math.abs(Math.sin(i*0.7+t*0.04));
+      ctx.globalAlpha=0.050+0.045*Math.abs(Math.sin(i*0.7+t*0.04));
       ctx.strokeStyle=col;
       ctx.stroke();
     }
