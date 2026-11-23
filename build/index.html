@@ -345,6 +345,25 @@ thead th{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:va
 tbody td{font-variant-numeric:tabular-nums}
 .seg button.on{background:var(--accent);color:var(--accent-ink)}
 
+
+.legend{padding:12px 13px;min-width:210px}
+.lg-t{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;font-weight:600}
+.lg-bar{height:8px;border-radius:99px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.10)}
+.lg-r{display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.lg-k{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--muted);margin-top:8px}
+.lg-k i{width:8px;height:8px;border-radius:2px;flex:none}
+.lg-k:first-of-type{margin-top:12px;padding-top:10px;border-top:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
+.mapnote{font-size:11px;max-width:min(46ch,58%);opacity:.9}
+.maplibregl-ctrl-attrib{background:transparent!important;font-size:10px!important;opacity:.55}
+.maplibregl-ctrl-attrib a{color:var(--muted)!important}
+
+.mapbar{background:rgba(10,12,13,.72);border:1px solid rgba(255,255,255,.07);box-shadow:var(--e3)}
+:root[data-theme="light"] .mapbar{background:rgba(255,255,255,.78);border-color:rgba(16,26,24,.10)}
+.seg button.on{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 28%,transparent)}
+:root[data-theme="light"] .seg button.on{background:color-mix(in srgb,var(--accent) 10%,transparent);color:var(--accent)}
+.kpi .l{font-size:13px;color:color-mix(in srgb,var(--ink) 62%,transparent);gap:7px}
+.legend{bottom:14px;right:14px}
+.mapnote{left:14px;bottom:14px}
 </style>
 </head>
 <body>
@@ -2753,11 +2772,11 @@ const METRICLABEL = {
   year_access:"Latest access observation, year"
 };
 const RAMP = {
-  access:["#6b1f1f","#9c3a32","#c06a34","#c99a3a","#6fae7a","#2f8f6f"],
-  unserved_m:["#1d2a33","#28505c","#357f6e","#63b287","#f0a13a","#e05c5c"],
-  losses:["#1d2a33","#28505c","#357f6e","#c99a3a","#e07b3a","#e05c5c"],
-  km_per_1000km2:["#1d2a33","#28505c","#357f6e","#63b287","#c9c83a","#f0a13a"],
-  year_access:["#6b1f1f","#9c3a32","#c06a34","#c99a3a","#6fae7a","#2f8f6f"]
+  access:["#0d1512","#12463a","#1a7d63","#37bb93","#7bf7c8"],
+  unserved_m:["#100f0c","#3a3020","#6f5a32","#a8833f","#e8c27a"],
+  losses:["#120f0d","#432a20","#84462e","#c4753f","#f2c48a"],
+  km_per_1000km2:["#0b1013","#16323d","#215a6b","#3f96a8","#8edbe8"],
+  year_access:["#141414","#3a3a3a","#6a6a6a","#9c9c9c","#d8d8d8"]
 };
 const RANGE = {access:[0,100],unserved_m:[0,60],losses:[0,30],km_per_1000km2:[0,600],year_access:[2010,2026]};
 const TABMETRIC = {access:"access",perf:"losses",net:"km_per_1000km2",cover:"year_access"};
@@ -2811,7 +2830,7 @@ function buildKpis(){
   document.getElementById("kpis").innerHTML=kpis.map((k,idx)=>
     `<div class="kpi" style="--i:${idx}"><div class="n">${k[0]}${k[1]?`<span class="u">${k[1]}</span>`:""}</div>
       <div class="l"><svg class="ic" aria-hidden="true"><use href="#i-${k[3]}"/></svg>${k[2]}</div>
-      ${spark(k[4])}</div>`).join("");
+      </div>`).join("");
 }
 function buildFilters(){
   const rs=[...new Set(ROWS.map(r=>r.region).filter(Boolean))].sort();
@@ -3228,6 +3247,17 @@ function addCustomLayers(){
   } else { refreshDeck(); }
 }
 
+function calmBasemap(){
+  try{
+    const st=MAP.getStyle(); if(!st||!st.layers) return;
+    st.layers.forEach(l=>{
+      if(l.type!=="symbol") return;
+      if(true)
+        MAP.setLayoutProperty(l.id,"visibility","none");
+    });
+    ["place"].forEach(()=>{});
+  }catch(e){}
+}
 function initMap(){
   fetch("data/countries.geo.json").then(r=>r.json()).then(geo=>{
     GEO=geo; GEOJSON=buildGeo();
@@ -3238,9 +3268,10 @@ function initMap(){
     });
     window.MAP=MAP;
     MAP.on("load",()=>{
+      calmBasemap();
       addCustomLayers();
       MAP.on("moveend",()=>{refreshGrid();updateNote();});
-      MAP.on("style.load",()=>{addCustomLayers();refreshGrid();});
+      MAP.on("style.load",()=>{calmBasemap();addCustomLayers();refreshGrid();});
       document.querySelectorAll("#mode button").forEach(b=>b.onclick=()=>setMode(b.dataset.m));
       document.getElementById("metric").onchange=()=>{
         METRIC=document.getElementById("metric").value; refreshDeck(); updateLegend();
