@@ -3511,14 +3511,14 @@ function initBg(){
       const base=(i+0.55)*H/lines;
       ctx.beginPath();
       for(let x=-pad;x<=W+pad;x+=step){
-        const u=x/W;
+        const u=(x/W)+t*0.004;
         const y=base
           +Math.sin(u*6.2832*1.15+i*0.42+t*0.11)*13*dpr
           +Math.sin(u*6.2832*2.70-i*0.23+t*0.06)*6*dpr
           +Math.sin(u*6.2832*0.42+i*0.90+t*0.03)*22*dpr;
         if(x<=-pad+0.001) ctx.moveTo(x,y); else ctx.lineTo(x,y);
       }
-      ctx.globalAlpha=0.050+0.045*Math.abs(Math.sin(i*0.7+t*0.04));
+      ctx.globalAlpha=0.062+0.062*Math.abs(Math.sin(i*0.7+t*0.04));
       ctx.strokeStyle=col;
       ctx.stroke();
     }
