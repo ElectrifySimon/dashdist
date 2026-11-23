@@ -157,13 +157,16 @@ select{cursor:pointer;max-width:100%}
 input[type=search]{flex:1 1 220px;min-width:0}
 input[type=search]:focus,select:focus{border-color:var(--accent)}
 .count{color:var(--muted);font-size:12.5px;margin-left:auto;white-space:nowrap}
-.tabs{display:flex;gap:8px;margin:0 0 14px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.tabs{display:flex;gap:26px;margin:0 0 18px;overflow-x:auto;scrollbar-width:none;
+  border-bottom:1px solid var(--line)}
 .tabs::-webkit-scrollbar{display:none}
-.tab{background:var(--surface);box-shadow:var(--e1);border:0;color:var(--muted);white-space:nowrap;
+.tab{background:none;box-shadow:none;border:0;border-bottom:2px solid transparent;border-radius:0;
+  color:var(--muted);white-space:nowrap;margin-bottom:-1px;
   padding:0 15px;min-height:44px;display:inline-flex;align-items:center;border-radius:10px;font-size:13px;cursor:pointer;
   transition:background var(--d-feedback) var(--e-out),color var(--d-feedback) var(--e-out),border-color var(--d-feedback) var(--e-out),transform 90ms var(--e-out)}
-.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);font-weight:650;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 2px 6px rgba(0,0,0,.35)}
+.tab[aria-selected="true"]{background:none;color:var(--ink);font-weight:600;
+  border-bottom-color:var(--accent);box-shadow:none}
+.tab:hover{color:var(--ink)}
 .tab:active{transform:scale(.97)}
 
 /* table */
@@ -180,6 +183,7 @@ thead th .ar{opacity:.45;font-size:9px;margin-left:5px}
 thead th[aria-sort] .ar{opacity:1;color:var(--accent)}
 tbody tr{cursor:pointer}
 tbody tr:hover td{background:var(--surface2)}
+tbody tr:hover td:first-child{box-shadow:inset 2px 0 0 var(--accent)}
 td.name{font-weight:550}
 td:first-child{position:sticky;left:0;background:var(--surface);z-index:1}
 tbody tr:hover td:first-child{background:var(--surface2)}
@@ -199,8 +203,13 @@ tbody tr:hover td:first-child{background:var(--surface2)}
 .card .note{font-size:11.5px;color:var(--muted);margin:6px 0 2px;min-height:16px}
 
 /* footer */
-.foot{margin-top:28px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;line-height:1.7}
-.foot h2{font-size:12px;margin:0 0 8px;color:var(--ink)}
+.foot{margin-top:32px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.65}
+.footgrid{display:grid;grid-template-columns:1.4fr 1fr 1fr .9fr;gap:32px}
+.footgrid section{min-width:0}
+@media(max-width:980px){.footgrid{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){.footgrid{grid-template-columns:1fr;gap:20px}}
+.foot h2{font-size:12px;font-weight:600;margin:0 0 8px;color:var(--ink);letter-spacing:0}
+.foot p{margin:0 0 8px}
 .foot ul{margin:0 0 10px;padding-left:18px}
 .foot li{margin:2px 0}
 .foot a{color:var(--accent);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
@@ -240,6 +249,11 @@ tbody tr:hover td:first-child{background:var(--surface2)}
   60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:10px}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.masthead{animation:rise var(--d-panel) var(--e-out) both}
+.kpi{animation:rise var(--d-ui) var(--e-out) both;animation-delay:calc(var(--i,0) * 30ms)}
+#map{animation:rise 380ms var(--e-out) 140ms both}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 svg.ic{width:16px;height:16px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.75;
   stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px}
 .tab svg.ic,.btn svg.ic{margin-right:7px}
@@ -2720,7 +2734,7 @@ function buildKpis(){
     [String(lossHigh),"Countries at 15% losses or more","triangle-alert"]
   ];
   document.getElementById("kpis").innerHTML=kpis.map(([n,l,i])=>
-    `<div class="kpi"><div class="n">${n}</div><div class="l">
+    `<div class="kpi" style="--i:${kpis.indexOf([n,l,i])}"><div class="n">${n}</div><div class="l">
       <svg class="ic" aria-hidden="true"><use href="#i-${i}"/></svg>${l}</div></div>`).join("");
 }
 
@@ -2732,27 +2746,47 @@ function buildFilters(){
 }
 
 function buildFoot(){
+  const maxYear=ROWS.flatMap(r=>[r.year_access,r.year_losses,r.year_kwh]).filter(y=>y)
+    .reduce((a,b)=>Math.max(a,b),0)||"n/a";
   document.getElementById("foot").innerHTML=`
     <p class="footmeta">
       <span><b>${ROWS.length}</b> countries</span>
-      <span>Reference year <b>${ROWS.flatMap(r=>[r.year_access,r.year_losses,r.year_kwh]).filter(y=>y).reduce((a,b)=>Math.max(a,b),0)||"n/a"}</b></span>
-      <span>Published <b>21 November 2026</b></span>
+      <span>Reference year <b>${maxYear}</b></span>
+      <span>Published <b>23 November 2026</b></span>
       <span>Licence CC BY 4.0</span>
     </p>
-    <h2>Sources and notes</h2>
-    <ul>
-      <li>Country indicators: World Bank World Development Indicators, latest observation per series,
-        <a href="https://datacatalog.worldbank.org/dataset/world-development-indicators" target="_blank" rel="noopener">datacatalog.worldbank.org</a>, CC BY 4.0.
-        Series: access, urban access, rural access, T&amp;D losses, consumption per capita, population, GDP per capita.</li>
-      <li>Predicted distribution network: ESMAP gridfinder, World Bank,
-        <a href="https://energydata.info/dataset/predictive-grid-mapping-2019" target="_blank" rel="noopener">energydata.info</a>, CC BY 4.0.
-        Model output, not an asset register; validation is about 70% at 1 km. Network length is computed per country in an equal-area projection.</li>
-      <li>Country boundaries: Natural Earth 110m, public domain. Basemap: OpenFreeMap and OpenStreetMap contributors, ODbL.</li>
-      <li>Rendering: MapLibre, deck.gl, Apache ECharts, ChartGPU. No API key and no third-party data service at runtime.</li>
-    </ul>
-    <p>Machine-readable export: <a href="data/dashboard.json" type="application/json">data/dashboard.json</a>.
-      Field names match the table headings. Unserved people = population x (1 - access rate).
-      Countries below five million population are excluded. Corrections and questions: Simon Benmarraze.</p>`;
+    <div class="footgrid">
+      <section>
+        <h2>Data</h2>
+        <ul>
+          <li>Country indicators: World Bank World Development Indicators, latest observation per series,
+            <a href="https://datacatalog.worldbank.org/dataset/world-development-indicators" target="_blank" rel="noopener">datacatalog.worldbank.org</a>, CC BY 4.0.</li>
+          <li>Predicted distribution network: ESMAP gridfinder, World Bank,
+            <a href="https://energydata.info/dataset/predictive-grid-mapping-2019" target="_blank" rel="noopener">energydata.info</a>, CC BY 4.0.</li>
+          <li>Country boundaries: Natural Earth 110m, public domain.</li>
+        </ul>
+      </section>
+      <section>
+        <h2>Method</h2>
+        <p>Unserved people = population x (1 - access rate). Network length is computed per country in an
+          equal-area projection (EPSG:6933). Gridfinder is model output, not an asset register; validation is
+          about 70% at 1 km. Countries below five million population are excluded.</p>
+      </section>
+      <section>
+        <h2>Rights</h2>
+        <p>Indicators and network data CC BY 4.0. Basemap tiles from OpenFreeMap and OpenStreetMap
+          contributors, ODbL. Reuse with attribution to the sources listed here.</p>
+      </section>
+      <section>
+        <h2>Machine-readable</h2>
+        <ul>
+          <li><a href="data/dashboard.json" type="application/json">dashboard.json</a>, full table with field names</li>
+          <li><a href="llms.txt">llms.txt</a>, summary for agents</li>
+          <li>CSV per table from the toolbar</li>
+        </ul>
+        <p>Corrections: Simon Benmarraze.</p>
+      </section>
+    </div>`;
 }
 
 function filtered(){
@@ -2853,9 +2887,19 @@ function disposeCharts(){CHARTS.forEach(c=>{try{c.dispose()}catch(e){}});CHARTS=
 function baseOpt(){
   return {
     backgroundColor:"transparent",
-    textStyle:{fontFamily:"Inter,system-ui,-apple-system,'Segoe UI',sans-serif",color:cssv("--muted")},
+    textStyle:{fontFamily:"'Instrument Sans',system-ui,-apple-system,'Segoe UI',sans-serif",color:cssv("--muted")},
     animationDuration:650, animationEasing:"cubicOut",
-    grid:{left:8,right:18,top:14,bottom:8,containLabel:true}
+    grid:{left:8,right:18,top:14,bottom:8,containLabel:true},
+    tooltip:{
+      backgroundColor:cssv("--surface"),borderColor:cssv("--line"),borderWidth:1,
+      padding:[9,11],textStyle:{color:cssv("--ink"),fontSize:12},
+      extraCssText:"border-radius:10px;box-shadow:0 12px 34px rgba(0,0,0,.45)",
+      axisPointer:{type:"cross",lineStyle:{color:cssv("--line"),width:1},
+        crossStyle:{color:cssv("--line"),width:1},
+        label:{backgroundColor:cssv("--surface2"),color:cssv("--ink"),fontSize:11,
+          borderColor:cssv("--line"),borderWidth:1,padding:[4,6]}}
+    },
+    emphasis:{focus:"series"}
   };
 }
 function axT(){
@@ -2866,7 +2910,10 @@ function axT(){
 function mk(id,opt){
   const el=document.getElementById(id); if(!el) return;
   const c=echarts.init(el,null,{renderer:"canvas"});
-  c.setOption(Object.assign(baseOpt(),opt)); CHARTS.push(c);
+  const base=baseOpt();
+  const cartesian=(opt.series||[]).some(s=>["bar","line","area"].includes(s.type));
+  base.tooltip.trigger=cartesian?"axis":"item";
+  c.setOption(Object.assign(base,opt)); CHARTS.push(c);
 }
 function drawCharts(){
   const el=document.getElementById("charts");
