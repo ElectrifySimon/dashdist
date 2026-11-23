@@ -361,7 +361,7 @@ tbody td{font-variant-numeric:tabular-nums}
 :root[data-theme="light"] .mapbar{background:rgba(255,255,255,.78);border-color:rgba(16,26,24,.10)}
 .seg button.on{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 28%,transparent)}
 :root[data-theme="light"] .seg button.on{background:color-mix(in srgb,var(--accent) 10%,transparent);color:var(--accent)}
-.kpi .l{font-size:13px;color:color-mix(in srgb,var(--ink) 62%,transparent);gap:7px}
+.kpi .l{font-size:13.5px;color:color-mix(in srgb,var(--ink) 74%,transparent);gap:8px}
 .legend{bottom:14px;right:14px}
 .mapnote{left:14px;bottom:14px}
 </style>
@@ -509,7 +509,7 @@ const METRICLABEL = {
   year_access:"Latest access observation, year"
 };
 const RAMP = {
-  access:["#0d1512","#12463a","#1a7d63","#37bb93","#7bf7c8"],
+  access:["#123c34","#1d6b58","#3d9c78","#8fd3a8","#f2e3b3"],
   unserved_m:["#100f0c","#3a3020","#6f5a32","#a8833f","#e8c27a"],
   losses:["#120f0d","#432a20","#84462e","#c4753f","#f2c48a"],
   km_per_1000km2:["#0b1013","#16323d","#215a6b","#3f96a8","#8edbe8"],
@@ -992,7 +992,14 @@ function calmBasemap(){
       if(true)
         MAP.setLayoutProperty(l.id,"visibility","none");
     });
-    ["place"].forEach(()=>{});
+    const dark=isDark();
+    st.layers.forEach(l=>{
+      try{
+        if(l.type==="background") MAP.setPaintProperty(l.id,"background-color",dark?"#080a0b":"#f2f1ec");
+        if(l.type==="fill"&&/water/.test(l.id)) MAP.setPaintProperty(l.id,"fill-color",dark?"#0a1115":"#e4e9e7");
+        if(l.type==="line"&&/bound/.test(l.id)) MAP.setPaintProperty(l.id,"line-color",dark?"rgba(255,255,255,.22)":"rgba(10,20,20,.22)");
+      }catch(e){}
+    });
   }catch(e){}
 }
 function initMap(){
