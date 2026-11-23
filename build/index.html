@@ -80,7 +80,10 @@
   --shadow:var(--e2);
 }
 *{box-sizing:border-box}
-html,body{margin:0;padding:0}
+html,body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(1100px 460px at 18% -12%, color-mix(in srgb,var(--accent) 12%, transparent), transparent 72%)}
+.wrap{position:relative;z-index:1}
+body{margin:0;padding:0}
 body{background-color:var(--bg);background-image:radial-gradient(1200px 620px at 50% -12%,var(--wash-top),transparent 65%);background-attachment:fixed;color:var(--ink);
   font-family:"Instrument Sans",Figtree,-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
   font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;
@@ -112,15 +115,21 @@ h1{margin:0;font-size:clamp(21px,2.2vw,27px);font-weight:600;letter-spacing:-.02
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px;margin:24px 0}
 .kpi{background:var(--surface);background-image:linear-gradient(180deg,var(--hi),transparent 55%);border:0;border-radius:12px;
   padding:16px 16px 14px;position:relative;box-shadow:var(--e2);transition:transform var(--d-ui) var(--e-out),box-shadow var(--d-ui) var(--e-out)}
+.kpi .u{font-size:.62em;font-weight:600;color:var(--muted);margin-left:1px}
+.spark{display:block;width:100%;height:26px;margin-top:11px;opacity:.55}
 .kpi .n{font-size:clamp(21px,2.3vw,26px);font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;
   font-feature-settings:"tnum" 1,"cv05" 1}
 .kpi .l{font-size:12px;color:var(--muted);margin-top:5px}
 
 /* map */
-.mapblock{margin-top:8px}
-.mapbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 10px}
-.seg{display:flex;gap:4px}
-.seg button{background:var(--surface);box-shadow:var(--e1);border:0;border-radius:10px;color:var(--muted);padding:0 16px;min-height:44px;font-size:13px;cursor:pointer}
+.mapblock{margin-top:10px;position:relative}
+.mapbar{position:absolute;top:12px;left:12px;z-index:3;display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+  margin:0;padding:6px;border-radius:14px;border:1px solid color-mix(in srgb,var(--line) 45%, transparent);
+  background:color-mix(in srgb,var(--surface) 76%, transparent);
+  -webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);
+  box-shadow:var(--e2);max-width:calc(100% - 24px)}
+.seg{display:flex;gap:2px;padding:2px;border-radius:10px;background:color-mix(in srgb,var(--ink) 4%, transparent)}
+.seg button{background:transparent;box-shadow:none;border:0;border-radius:8px;color:var(--muted);padding:0 12px;min-height:32px;font-size:12.5px;cursor:pointer;transition:color var(--d-feedback) var(--e-out),background var(--d-feedback) var(--e-out)}
 .seg button.on{background:var(--accent);color:var(--accent-ink);font-weight:650}
 select,input[type=search],.btn{background:var(--surface);border:0;box-shadow:var(--e1);color:var(--ink);
   border-radius:10px;padding:0 14px;font-size:14px;min-height:44px;outline:none;font-family:inherit}
@@ -130,10 +139,12 @@ select{cursor:pointer;max-width:100%}
 .btn.primary{background:var(--accent);color:var(--accent-ink);font-weight:600;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 2px 6px rgba(0,0,0,.35)}
 .btn.primary:hover{filter:brightness(1.05);color:var(--accent-ink)}
-#map{height:clamp(340px,58vh,640px);border:0;border-radius:12px;overflow:hidden;
-  position:relative;background:var(--surface);box-shadow:var(--e2)}
-.mapnote,.legend{position:absolute;z-index:2;background:var(--surface);
-  border:0;border-radius:10px;padding:9px 12px;font-size:12px;color:var(--muted);
+#map{height:clamp(420px,64vh,720px);border:1px solid color-mix(in srgb,var(--line) 55%, transparent);
+  border-radius:16px;overflow:hidden;position:relative;background:var(--surface);box-shadow:var(--e2)}
+.mapnote,.legend{position:absolute;z-index:2;background:color-mix(in srgb,var(--surface) 80%, transparent);
+  -webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2);
+  border:1px solid color-mix(in srgb,var(--line) 45%, transparent);border-radius:12px;
+  padding:10px 12px;font-size:12px;color:var(--muted);box-shadow:var(--e2);
   max-width:min(58ch,72%)}
 .mapnote{left:12px;bottom:12px}
 .legend{right:12px;bottom:12px;min-width:190px}
@@ -194,9 +205,11 @@ tbody tr:hover td:first-child{background:var(--surface2)}
 
 /* charts */
 .charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:14px;margin:4px 0 8px}
-.card{background:var(--surface);background-image:linear-gradient(180deg,var(--hi),transparent 60%);border:0;border-radius:12px;
+.card{background:var(--surface);background-image:linear-gradient(180deg,var(--hi),transparent 60%);
+  border:1px solid color-mix(in srgb,var(--line) 45%, transparent);border-radius:14px;
   padding:16px 16px 10px;box-shadow:var(--e2)}
-.card h3{margin:0;font-size:13.5px;font-weight:600;letter-spacing:.01em}
+.card h3{margin:0;font-size:13.5px;font-weight:600;letter-spacing:.01em;display:flex;align-items:center;gap:8px}
+.card h3::before{content:"";width:3px;height:12px;border-radius:2px;background:var(--accent);flex:none}
 .card p{margin:3px 0 10px;font-size:12px;color:var(--muted)}
 .card .plot{width:100%;height:300px}
 .card.wide{grid-column:1/-1}
@@ -2722,23 +2735,38 @@ function start(){
   buildKpis(); buildFilters(); buildFoot(); render(); initMap(); syncThemeButton(); updateLegend();
 }
 
+function hist(vals,bins){
+  bins=bins||16;
+  const v=vals.filter(x=>x!=null&&isFinite(x)); if(v.length<8) return null;
+  const lo=Math.min.apply(null,v), hi=Math.max.apply(null,v); const span=(hi-lo)||1;
+  const b=new Array(bins).fill(0);
+  v.forEach(x=>{let k=Math.floor((x-lo)/span*bins); if(k>=bins)k=bins-1; if(k<0)k=0; b[k]++;});
+  const m=Math.max.apply(null,b)||1;
+  return b.map(c=>Math.round(c/m*22));
+}
+function spark(bars){
+  if(!bars) return "";
+  const w=100/bars.length;
+  const rects=bars.map((h,i)=>`<rect x="${(i*w).toFixed(2)}" y="${22-h}" width="${(w*.62).toFixed(2)}" height="${h||1}" rx="1"/>`).join("");
+  return `<svg class="spark" viewBox="0 0 100 22" preserveAspectRatio="none" aria-hidden="true">${rects}</svg>`;
+}
 function buildKpis(){
   const unserved=ROWS.reduce((a,r)=>a+(r.unserved_m||0),0);
   const under90=ROWS.filter(r=>r.access!=null&&r.access<90).length;
   const lossMed=median(ROWS.map(r=>r.losses));
   const lossHigh=ROWS.filter(r=>r.losses!=null&&r.losses>=15).length;
   const kpis=[
-    [String(ROWS.length),"Countries covered","globe-2"],
-    [Math.round(unserved)+"m","People without access","plug-zap"],
-    [String(under90),"Countries below 90% access","gauge"],
-    [lossMed.toFixed(1)+"%","Median T&D losses","trending-down"],
-    [String(lossHigh),"Countries at 15% losses or more","triangle-alert"]
+    [String(ROWS.length),"","Countries covered","globe-2",null],
+    [Math.round(unserved),"m","People without access","plug-zap",hist(ROWS.map(r=>r.unserved_m))],
+    [String(under90),"","Countries below 90% access","gauge",hist(ROWS.map(r=>r.access))],
+    [lossMed.toFixed(1),"%","Median T&D losses","trending-down",hist(ROWS.map(r=>r.losses))],
+    [String(lossHigh),"","Countries at 15% losses or more","triangle-alert",null]
   ];
-  document.getElementById("kpis").innerHTML=kpis.map(([n,l,i])=>
-    `<div class="kpi" style="--i:${kpis.indexOf([n,l,i])}"><div class="n">${n}</div><div class="l">
-      <svg class="ic" aria-hidden="true"><use href="#i-${i}"/></svg>${l}</div></div>`).join("");
+  document.getElementById("kpis").innerHTML=kpis.map((k,idx)=>
+    `<div class="kpi" style="--i:${idx}"><div class="n">${k[0]}${k[1]?`<span class="u">${k[1]}</span>`:""}</div>
+      <div class="l"><svg class="ic" aria-hidden="true"><use href="#i-${k[3]}"/></svg>${k[2]}</div>
+      ${spark(k[4])}</div>`).join("");
 }
-
 function buildFilters(){
   const rs=[...new Set(ROWS.map(r=>r.region).filter(Boolean))].sort();
   const is=[...new Set(ROWS.map(r=>r.income).filter(Boolean))].sort();
