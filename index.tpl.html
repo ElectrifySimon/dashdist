@@ -368,6 +368,13 @@ tbody td{font-variant-numeric:tabular-nums}
 .legend{background:rgba(12,15,17,.93);border:1px solid rgba(255,255,255,.12);box-shadow:var(--e3)}
 :root[data-theme="light"] .legend{background:rgba(255,255,255,.95);border-color:rgba(16,26,24,.14)}
 .lg-t{color:color-mix(in srgb,var(--ink) 82%,transparent)}
+
+#bgfx{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.9}
+#grain{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.045;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='0.55'/></svg>");
+  background-size:160px 160px}
+:root[data-theme="light"] #grain{opacity:.085;mix-blend-mode:multiply}
+@media(prefers-reduced-motion:reduce){#bgfx{opacity:.75}}
 </style>
 </head>
 <body>
@@ -381,6 +388,8 @@ tbody td{font-variant-numeric:tabular-nums}
   <div id="err" role="alert"></div>
 </section>
 
+<canvas id="bgfx" aria-hidden="true"></canvas>
+<div id="grain" aria-hidden="true"></div>
 <div class="wrap" id="app" hidden>
   <header class="masthead">
     <div class="brand"><span class="mark" aria-hidden="true">DD</span>
@@ -1225,6 +1234,64 @@ document.getElementById("go").onclick=()=>{
 };
 document.getElementById("pw").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("go").click();});
 /* GATE-END */
+
+function initBg(){
+  const cv=document.getElementById("bgfx"); if(!cv) return;
+  const ctx=cv.getContext("2d",{alpha:true}); if(!ctx) return;
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let W=0,H=0,dpr=1,t=0,raf=0,last=0;
+  function size(){
+    dpr=Math.min(window.devicePixelRatio||1,2);
+    W=cv.width=Math.floor(window.innerWidth*dpr);
+    H=cv.height=Math.floor(window.innerHeight*dpr);
+  }
+  function accent(){
+    const v=getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+    return v||"#7bf7c8";
+  }
+  function draw(){
+    if(!W||!H){size();}
+    ctx.clearRect(0,0,W,H);
+    const col=accent();
+    const lines=Math.max(28,Math.round(H/(26*dpr)));
+    const step=Math.max(7,W/110);
+    const pad=80*dpr;
+    ctx.lineWidth=Math.max(1,dpr*0.85);
+    ctx.lineJoin="round";
+    for(let i=0;i<lines;i++){
+      const base=(i+0.55)*H/lines;
+      ctx.beginPath();
+      for(let x=-pad;x<=W+pad;x+=step){
+        const u=x/W;
+        const y=base
+          +Math.sin(u*6.2832*1.15+i*0.42+t*0.11)*13*dpr
+          +Math.sin(u*6.2832*2.70-i*0.23+t*0.06)*6*dpr
+          +Math.sin(u*6.2832*0.42+i*0.90+t*0.03)*22*dpr;
+        if(x<=-pad+0.001) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.globalAlpha=0.030+0.032*Math.abs(Math.sin(i*0.7+t*0.04));
+      ctx.strokeStyle=col;
+      ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+  }
+  function loop(ts){
+    raf=requestAnimationFrame(loop);
+    if(ts-last<33) return;
+    last=ts; t+=1/30;
+    draw();
+  }
+  size(); draw();
+  if(!reduce) raf=requestAnimationFrame(loop);
+  addEventListener("resize",()=>{clearTimeout(window.__bgT);window.__bgT=setTimeout(()=>{size();draw();},150)});
+  addEventListener("themechange",draw);
+  document.querySelectorAll("#theme").forEach(b=>b.addEventListener("click",()=>setTimeout(draw,60)));
+  document.addEventListener("visibilitychange",()=>{
+    if(document.hidden){cancelAnimationFrame(raf);raf=0;}
+    else if(!reduce&&!raf){last=0;raf=requestAnimationFrame(loop);}
+  });
+}
+initBg();
 </script>
 </body>
 </html>
