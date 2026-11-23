@@ -364,6 +364,10 @@ tbody td{font-variant-numeric:tabular-nums}
 .kpi .l{font-size:13.5px;color:color-mix(in srgb,var(--ink) 74%,transparent);gap:8px}
 .legend{bottom:14px;right:14px}
 .mapnote{left:14px;bottom:14px}
+
+.legend{background:rgba(12,15,17,.93);border:1px solid rgba(255,255,255,.12);box-shadow:var(--e3)}
+:root[data-theme="light"] .legend{background:rgba(255,255,255,.95);border-color:rgba(16,26,24,.14)}
+.lg-t{color:color-mix(in srgb,var(--ink) 82%,transparent)}
 </style>
 </head>
 <body>
@@ -958,9 +962,9 @@ function deckLayers(){
   })];
   if(showLines){
     L.push(new deck.GeoJsonLayer({id:"gridhalo",data:GRIDDATA,filled:false,stroked:true,
-      getLineColor:isDark()?[2,7,10,235]:[255,255,255,235],getLineWidth:4.4,lineWidthUnits:"pixels",pickable:false}));
+      getLineColor:isDark()?[6,10,12,150]:[255,255,255,150],getLineWidth:3.0,lineWidthUnits:"pixels",pickable:false}));
     L.push(new deck.GeoJsonLayer({id:"gridlines",data:GRIDDATA,filled:false,stroked:true,
-      getLineColor:d=>d.properties&&d.properties.source==="osm"?[251,191,36,255]:[34,211,238,255],
+      getLineColor:d=>d.properties&&d.properties.source==="osm"?[242,200,121,210]:[123,247,200,190],
       getLineWidth:1.8,lineWidthUnits:"pixels",pickable:false,
       updateTriggers:{getLineColor:[isDark()]}}));
   }
